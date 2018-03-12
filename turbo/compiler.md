@@ -35,6 +35,51 @@
   60,000% improvement
 - `Promise`s where ported to CodeStubAssembler which resulted in 500% speedup for `async/await`
 
+## Deoptimization Reasons
+
+### Class Definitions inside Functions
+
+```js
+function createPoint(x, y) {
+  class Point {
+    constructor(x, y) {
+      this.x = x
+      this.y = y
+    }
+
+    distance(other) {
+      const dx = Math.abs(this.x - other.x)
+      const dy = Math.abs(this.y - other.y)
+      return dx + dy
+    }
+  }
+
+  return new Point(x, y)
+}
+function usePoint(point) {
+  // do something with the point
+}
+```
+
+- defining a class inside `createPoint` results in its definition to be executed on each
+  `createPoint` invocation
+- executing that definition causes a new prototype to be created along with methods and
+  constructor
+- thus each new point has a different prototype and thus a different object shape
+- passing these objects with differing prototypes to `usePoint` makes that function
+  become polymorphic
+- v8 gives up on polymorphism after it has seen **more than 4** different object shapes, and enters
+  megamorphic state
+- as a result `usePoint` won't be optimized
+- pulling the `Point` class definition out of the `createPoint` function fixes that issue as
+  now the class definition is only executed once and all point prototypes match
+- the performance improvement resulting from that results from this simple change is
+  substantial, the exact speedup factor depends on the `usePoint` function
+
+### Resource
+
+- [optimization patterns part1](http://benediktmeurer.de/2017/06/20/javascript-optimization-patterns-part1/)
+
 ## Goals
 
 ### Smaller Performance Cliffs
