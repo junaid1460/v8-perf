@@ -54,3 +54,10 @@
 ### Resources
 
 - [V8: Behind the Scenes (November Edition)](http://benediktmeurer.de/2016/11/25/v8-behind-the-scenes-november-edition/)
+
+## Array Builtins
+
+- `Array` builtins like `map` and `forEach` can be inlined into TurboFan optimized code which
+  results in considerable performance improvement
+
+- [V8: Behind the Scenes (February Edition)](http://benediktmeurer.de/2017/03/01/v8-behind-the-scenes-february-edition/)

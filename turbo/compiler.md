@@ -12,7 +12,48 @@
   by Ignition)?
 - AST much simpler and smaller in size
 
+### Pipeline as Part of New V8 Architecture
+
+![new v8 pipeline detailed](http://benediktmeurer.de/images/2017/architecture-20170301.png)
+
+## Collecting Feedback via ICs
+
+- data-driven approach
+- uses FeedbackVector attached to every function, responsible to record and manage all
+  execution feedback to later speed up its execution
+
+## CodeStubAssembler
+
+- provides C++ based DSL to generate highly portable machne code
+- can generate highly efficient code for parts of slow-paths in JS without crossing to C++
+  runtime
+
+### Improvements via CodeStubAssembler
+
+- `Object.create` has predictable performance by using CodeStubAssembler
+- `Function.prototype.bind` archieved final boost when ported to CodeStubAssembler for a total
+  60,000% improvement
+- `Promise`s where ported to CodeStubAssembler which resulted in 500% speedup for `async/await`
+
 ## Goals
+
+### Smaller Performance Cliffs
+
+- for most websites the optimizing compiler isn't important and could even hurt performance
+  (speculative optimizations arent' cheap)
+- pages need to load fast and unoptimized code needs to run fast _enough_, esp. on mobile
+  devices
+- previous v8 implementations suffered from _performance cliffs_
+  - optimized code ran super fast (focus on peak performance case)
+  - baseline performance was much lower
+  - as a result one feature in your code that caused deoptimization would affect your app's
+    performance dramatically, i.e. 100x difference
+- TurboFan improves this as
+  - widens fast path to ensure that optimized code is more flexible and can accept more types
+    of arguments
+  - reduces code memory overhead by reusing code generation parts of TurboFan to build Ignition
+    interpreter
+  - improves slow path
 
 ### New Language Features
 
@@ -31,3 +72,4 @@
 ## Resources
 
 - [V8: Behind the Scenes (November Edition)](http://benediktmeurer.de/2016/11/25/v8-behind-the-scenes-november-edition/)
+- [V8: Behind the Scenes (February Edition)](http://benediktmeurer.de/2017/03/01/v8-behind-the-scenes-february-edition/)
