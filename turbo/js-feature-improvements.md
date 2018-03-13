@@ -44,16 +44,20 @@
 - optimizations weren't possible in these cases initially
 - by avoiding to depend on global protector cell for TurboFan and allowing inlining `instancof`
   code this performance bottleneck has been fixed
+- similar improvements were made in similar fashion to other _well-known symbols_ like
+  `@@iterator` and `@@toStringTag`
 
 ### Facit
 
-- developers can use `instanceof` freely
+- developers can use `instanceof` freely without worrying about non-deterministic performance
+  characteristics
 - developers should think hard before overriding its behavior via `@@hasInstance` since this
   _magical behavior_ may confuse others, but using it will incurr no performance penalties
 
 ### Resources
 
 - [V8: Behind the Scenes (November Edition)](http://benediktmeurer.de/2016/11/25/v8-behind-the-scenes-november-edition/)
+- [Investigating Performance of Object#toString in ES2015](http://benediktmeurer.de/2017/08/14/investigating-performance-object-prototype-to-string-es2015/)
 
 ## Array Builtins
 
