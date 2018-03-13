@@ -96,6 +96,9 @@
 - set iterators where implemented via a mix of self-hosted JavaScript and C++
 - allocated two objects per iteration step (memory overhead -> increased GC work)
 - transitioned between C++ and JS on every iteration step (expensive)
+- additionally each `for of` is implicitly wrapped in a `try/catch` block as per the language
+  specification, which prevented its optimization due to crankshaft not ever optimizing
+  functions which contained a `try/catch` statement
 
 ### What Changed?
 
@@ -105,6 +108,8 @@
 - avoid alloation of the _iterator_
 - fully implemented in JavaScript via [CodeStubAssembler](https://github.com/v8/v8/wiki/CodeStubAssembler-Builtins)
 - only calls to C++ during GC
+- full optimization now possible due to TurboFan's ability to optimize functions that include a
+  `try/catch` statement
 
 ### Facit
 
