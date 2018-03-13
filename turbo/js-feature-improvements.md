@@ -61,3 +61,22 @@
   results in considerable performance improvement
 
 - [V8: Behind the Scenes (February Edition)](http://benediktmeurer.de/2017/03/01/v8-behind-the-scenes-february-edition/)
+
+## const
+
+- `const` has more overhead when it comes to temporal deadzone related checks since it isn't
+  hoisted
+- however the `const` keyword also guarantees that once a value is assigned to its slot
+- as a result TurboFan skips loading and checking `const` slot values slots each time they are
+  accessed (_Function Context Specialization_)
+- thus `const` improves performance, but only once the code was optimized
+
+### Facit
+
+- `const`, like `let` adds cost due to TDZ (temporal deadzone) and thus performs slightly worse
+  in unoptimized code
+- `const` performs a lot better in optimized code than `var` or `let`
+
+### Resources
+
+- [JavaScript Optimization Patterns (Part 2)](http://benediktmeurer.de/2017/06/29/javascript-optimization-patterns-part2/)
