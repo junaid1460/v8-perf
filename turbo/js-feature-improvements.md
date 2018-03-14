@@ -205,3 +205,34 @@ for (const prop in obj) {
 
 - [Restoring for..in peak performance](http://benediktmeurer.de/2017/09/07/restoring-for-in-peak-performance/)
 - [Require Guarding for-in](https://eslint.org/docs/rules/guard-for-in)
+
+## Object Constructor Subclassing and Class Factories
+
+- pure object subclassing `class A extends Object {}` by itself is not useful as `class B
+  {}` will yield the same result even though [`class A`'s constructor will have different
+  prototype chain than `class B`'s](https://github.com/thlorenz/d8box/blob/8ec3c71cb6bdd7fe8e32b82c5f19d5ff24c65776/examples/object-subclassing.js#L22-L23)
+- however subclassing to `Object` is heavily used when implementing mixins via class factories
+- in the case that no base class is desired we pass `Object` as in the example below
+
+```js
+function createClassBasedOn(BaseClass) {
+  return class Foo extends BaseClass { }
+}
+class Bar {}
+
+const JustFoo = createClassBasedOn(Object)
+const FooBar = createClassBasedOn(Bar)
+```
+
+- TurboFan detects the cases for which the `Object` constructor is used as the base class and
+  fully inlines object instantiation
+
+### Facit
+
+- class factories won't incur any extra overhead if no specific base class needs to be _mixed
+  in_ and `Object` is passed to be extended from
+- therefore use freely wherever if mixins make sense
+
+### Resources
+
+- [Optimize Object constructor subclassing](http://benediktmeurer.de/2017/10/05/connecting-the-dots/#optimize-object-constructor-subclassing)

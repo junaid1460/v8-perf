@@ -1,5 +1,8 @@
 # Ignition and TurboFan Compiler Pipeline
 
+Fully activated with v8 version 5.9. Earliest LTS Node.js release with a TurboFan activated
+pipleline is Node.js v8.
+
 ## Simplified Pipeline
 
 - once crankshaft was taken out of the mix the below pipeline was possible
