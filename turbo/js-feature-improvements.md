@@ -149,3 +149,59 @@
 ### Resources
 
 - [Faster Collection Iterators - Callback Based Iteration](http://benediktmeurer.de/2017/07/14/faster-collection-iterators/#callback-based-iteration)
+
+## Iterating Object properties via for in
+
+### Incorrect Use of For In To Iterate Object Properties
+
+```js
+var ownProps = 0
+for (const prop in obj) {
+  if (obj.hasOwnProperty(prop)) ownProps++
+}
+```
+
+- problematic due to `obj.hasOwnProperty` call
+  - may raise an error if `obj` was created via `Object.create(null)`
+  - `obj.hasOwnProperty` becomes megamorphic if `obj`s with different shapes are passed
+- better to replace that call with `Object.prototype.hasOwnProperty.call(obj, prop)` as it is
+  safer and avoids potential performance hit
+
+### Correct Use of For In To Iterate Object Properties
+
+```js
+var ownProps = 0
+for (const prop in obj) {
+  if (Object.prototype.hasOwnProperty.call(obj, prop)) ownProps++
+}
+```
+
+### Why was it Fast?
+
+- crankshaft applied two optimizations for cases were only enumerable fast properties on
+  receiver were considered and prototype chain didn't contain enumerable properties or other
+  special cases like proxies
+- _constant-folded_ `Object.hasOwnProperty` calls inside `for in` to `true` whenever
+  possible, the below three conditions need to be met
+  - object passed to call is identical to object we are enumerating
+  - object shape didn't change during loop iteration
+  - the passed key is the current enumerated property name
+- enum cache indices were used to speed up property access
+
+### What Changed?
+
+- _enum cache_ needed to be adapted so TurboFan knew when it could safely use _enum cache
+  indices_ in order to avoid deoptimization loop (that also affected crankshaft)
+- _constant folding_ was ported to TurboFan
+- coupled with other TurboFan+Ignition advantages this led to ~60% speedup of the above case
+
+### Facit
+
+- `for in` coupled with the correct use of `Object.prototype.hasOwnProperty.call(obj, prop)` is
+  a very fast way to iterate over the properties of an object and thus should be used for these
+  cases
+
+### Resources
+
+- [Restoring for..in peak performance](http://benediktmeurer.de/2017/09/07/restoring-for-in-peak-performance/)
+- [Require Guarding for-in](https://eslint.org/docs/rules/guard-for-in)
