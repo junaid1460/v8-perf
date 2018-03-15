@@ -236,3 +236,43 @@ const FooBar = createClassBasedOn(Bar)
 ### Resources
 
 - [Optimize Object constructor subclassing](http://benediktmeurer.de/2017/10/05/connecting-the-dots/#optimize-object-constructor-subclassing)
+
+## Tagged Templates
+
+- [tagged templates](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#Tagged_templates)
+  are optimized by TurboFan and can be used where they apply
+
+### Resources
+
+- [optimize tagged templates](http://benediktmeurer.de/2017/10/05/connecting-the-dots/#optimize-tagged-templates)
+
+## Typed Arrays and ArrayBuffer
+
+- typed arrays are highly optimized by TurboFan
+- calls to [`Function.prototype.apply` with TypedArrays as a parameter](http://benediktmeurer.de/2017/10/05/connecting-the-dots/#fast-path-for-typedarrays-in-functionprototypeapply)
+  were sped up which positively affected calls to `String.fromCharCode`
+- [`ArrayBuffer` view checks](http://benediktmeurer.de/2017/10/05/connecting-the-dots/#optimize-arraybuffer-view-checks)
+  were improved by optimizing `ArrayBuffer.isView` and `TypedArray.prototype[@@toStringTag]
+- storing booleans inside TypedArrays was improved to where it now is identical to storing
+  integers
+
+### Facit
+
+- TypedArrays should be used wherever possible as it allows v8 to apply optimizations faster
+  and more aggressively than for instance with plain Arrays
+- any remaining bottlenecks will be fixed ASAP as TypedArrays being fast is a prerequisite of
+  Webgl performing smoothly
+
+### Resources
+
+- [Connecting the dots](http://benediktmeurer.de/2017/10/05/connecting-the-dots)
+
+## Object.is
+
+- one usecase of `Object.is` is to check if a value is `-0` via `Object.is(v, -0)`
+- previously implemented as C++ and thus couldn't be optimized
+- now implemented via fast CodeStubAssembler which improved performance by ~14x
+
+### Resources
+
+- [Improve performance of Object.is](http://benediktmeurer.de/2017/10/05/connecting-the-dots/#improve-performance-of-objectis)
