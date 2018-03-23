@@ -5,31 +5,16 @@ pipleline is Node.js v8.
 
 ## Goals
 
-### Smaller Performance Cliffs
+[watch](https://youtu.be/HDuSEbLWyOY?t=7m22s)
 
-- for most websites the optimizing compiler isn't important and could even hurt performance
-  (speculative optimizations arent' cheap)
-- pages need to load fast and unoptimized code needs to run fast _enough_, esp. on mobile
-  devices
-- previous v8 implementations suffered from _performance cliffs_
-  - optimized code ran super fast (focus on peak performance case)
-  - baseline performance was much lower
-  - as a result one feature in your code that caused deoptimization would affect your app's
-    performance dramatically, i.e. 100x difference
-- TurboFan improves this as
-  - widens fast path to ensure that optimized code is more flexible and can accept more types
-    of arguments
-  - reduces code memory overhead by reusing code generation parts of TurboFan to build Ignition
-    interpreter
-  - improves slow path
+> Speed up real world performance for modern JavaScript, and enable developers to build a
+> faster future web.
 
-### New Language Features
-
-- new language features are not useful by just being implemented
-- need to be fast (at least matching transpiled code), related optimizations are easier with
-  new pipeline
-- need to support debugging and be inspectable, this is archieved via better integration with
-  Chrome DevTools
+- fast startup vs. peak performance
+- low memory vs. max optimization
+- Ignition Interpreter allows to run code with some amount of optimization very quickly and has
+  very low memory footprint 
+- TurboFan makes functions that run a lot fast, sacrificing some memory in the process
 
 ## Simplified Pipeline
 
@@ -53,15 +38,111 @@ pipleline is Node.js v8.
 
 <img alt="new v8 pipeline detailed" src="http://benediktmeurer.de/images/2017/architecture-20170301.png" width="70%">
 
-### Advantages Over Old Pipeline
+### Detailed Phases of Frontend, Optimization and Backend Stages
 
-- enabled lots more optimizations
+<img alt="phases" src="http://benediktmeurer.de/images/2017/turbofan-20171213.png" width="70%">
+
+## Advantages Over Old Pipeline
+
+[watch old architecture](https://youtu.be/HDuSEbLWyOY?t=8m51s) | [watch new architecture](https://youtu.be/HDuSEbLWyOY?t=9m21s)
+
 - reduces memory and startup overhead significantly
-- AST no longer source of truth that compilers need to agree on (TODO: which is, IR generated
-  by Ignition)?
+- AST no longer source of truth that compilers need to agree on
 - AST much simpler and smaller in size
+- TurboFan uses Ignition bytecode directly to optimize (no re-parse needed)
+- combines cutting-edge IR (intermediate representation) with multi-layered translation +
+  optimization pipeline
+- generates better quality machine code than Crankshaft JIT
+- to achieve that fluid code motion, control flow optimizations and precise numerical range
+  analysis are used
+- clearer separation between JavaScript, v8 and the target architectures allows cleaner, more
+  robust generated code and adds flexibility
+- relaxed [sea of nodes]() (IR) allows more effective reordering and optimization
+- crossing from JS to C++ land has been minimized using techniques like CodeStubAssembler
+- as a result optimizations can be applied in more cases and are attempted more aggressively
+- for the same reason (and due to other improvements) TurboFan inlines code more aggressively,
+  leading to even more performance improvements
+
+### Smaller Performance Cliffs
+
+- for most websites the optimizing compiler isn't important and could even hurt performance
+  (speculative optimizations arent' cheap)
+- pages need to load fast and unoptimized code needs to run fast _enough_, esp. on mobile
+  devices
+- previous v8 implementations suffered from _performance cliffs_
+  - optimized code ran super fast (focus on peak performance case)
+  - baseline performance was much lower
+  - as a result one feature in your code that caused deoptimization would affect your app's
+    performance dramatically, i.e. 100x difference
+- TurboFan improves this as
+  - widens fast path to ensure that optimized code is more flexible and can accept more types
+    of arguments
+  - reduces code memory overhead by reusing code generation parts of TurboFan to build Ignition
+    interpreter
+  - improves slow path
+
+### Startup Time Improved
+
+[watch](https://youtu.be/M1FBosB5tjM?t=43m25s)
+
+- bytecode smaller and faster to generate than machine code (crankshaft)
+- bytecode better suited for smaller icache (low end mobile)
+- code parsed + AST converted to bytecode only once and optimized from bytecode
+- data driven ICs reduced slow path cost (collected in feedback form, previously collected in code form)
+
+### Memory Usage Reduced
+
+[watch](https://youtu.be/M1FBosB5tjM?t=47m20s)
+
+- most important on mobile
+- Ignition code up to 8x smaller than Full-Codegen code (crankshaft)
+
+### Baseline Performance Improved
+
+[watch](https://youtu.be/M1FBosB5tjM?t=37m)
+
+- no longer relying on optimizing compiler for _sufficiently_ fast code
+- thus improved baseline performance allows delaying optimization until more feedback is collected
+- leads to less time and resources spent optimizing
+
+### New Language Features
+
+[watch](https://youtu.be/M1FBosB5tjM?t=29m3s) | [watch](https://youtu.be/EdFDJANJJLs?t=20m) | [watch](https://youtu.be/HDuSEbLWyOY?t=11m22s)
+
+- can address optimization killers that Crankshaft couldn't b/c it never supported fundamental techniques needed to do so
+- as a result no specific syntax (like `try/catch`) inside a function will cause it not being optimized
+- other subtle optimization killers that made performance unpredictable are no longer an issue and if they are they can be easily fixed in TF
+	- passing `undefined` as first parameter to `Math.max.apply` 
+	- mixing strict and sloppy modes
+- easier to support future JavaScript features as the JavaScript frontend is clearly separated
+  from the architecture dependent backends
+- new language features are not useful by just being implemented
+- need to be fast (at least matching transpiled code), related optimizations are easier with
+  new pipeline
+- need to support debugging and be inspectable, this is archieved via better integration with
+  Chrome DevTools
+- new language features are easier optimized which makes them useable after much shorter time
+  after they are introduced to v8 (previously performance issues for new features prevented
+  their use in code that needed to run fast)
+- performance of ES6 features relative to the ES5 baseline operations per second tracked at [sixspeed](http://incaseofstairs.com/six-speed/)
+- at this point ES6 features are almost on par with ES5 versions of same code for most cases
+
+#### New Language Features Support And Transpilers
+
+[watch how to leverage babel optimally](https://youtu.be/HDuSEbLWyOY?t=15m5s)| [read deploying es2015 code](https://philipwalton.com/articles/deploying-es2015-code-in-production-today/)
+
+- using features directly, instead of transpiling, results in smaller code size [watch](https://youtu.be/HDuSEbLWyOY?t=13m)
+- additionally less parse time for untranspiled code and easier optimized
+- use [babel-preset-env](https://github.com/babel/babel/tree/master/packages/babel-preset-env) to specify browsers to target
+- therefore transpile es2015+ selectively
+
+### Resources
+
+- [Digging into the TurboFan JIT](https://v8project.blogspot.com/2015/07/digging-into-turbofan-jit.html)
 
 ## Ignition Interpreter
+
+[watch](https://youtu.be/EdFDJANJJLs?t=13m16s)
 
 - Ignition Interpreter uses a [register machine](https://en.wikipedia.org/wiki/Register_machine)
   instead of stack machine used previously
@@ -74,6 +155,8 @@ pipleline is Node.js v8.
 
 ## Collecting Feedback via ICs
 
+[watch hidden classes/maps](https://youtu.be/u7zRSm8jzvA?t=6m12s) | [watch](https://youtu.be/u7zRSm8jzvA?t=8m20s) | [watch feedback workflow]((https://youtu.be/u7zRSm8jzvA?t=14m58s))
+
 - main concept is the same as with old compiler chain, therefore [find more information here](https://github.com/thlorenz/v8-perf/blob/master/compiler.md#inline-caches)
 - changes to how/what data is collected
   - data-driven approach
@@ -83,6 +166,15 @@ pipleline is Node.js v8.
     of feedback
 - we can inspect what's inside the _FeedbackVector_ of a function in a debug build of d8 by
   passing the `--allow-natives-syntax` flag and calling `%DebugPrint(fn)`
+- polymorphic: 2-4 different types seen
+- if monomorphic compare maps and if they match just load prop at offset in memory, i.e. `mov eax, [eax+0xb]`
+- IC feedback slots reserved when AST is created, see them via `--print-ast`, i.e. `Slot(0) at 29`
+- collect typeinfo for ~24% of the ICs before attempting optimization
+- see optimization + IC info via `--trace-opt`
+	-  _generic ICs_ are _bad_ as if lots of them are present, code will not be optimized
+	- _ICs with typeinfo_ are _good_
+- feedback vectors aren't embedded in optimized code but map ids or specific type checks, like for SMIs
+- evaluate ICs via  `--trace-ic test.js && ./v8/tools/ic-processor`
 
 ### Feedback Lattice
 
@@ -126,26 +218,31 @@ pipleline is Node.js v8.
 - SharedFunctionInfo: general info about the function like source position and bytecode
 - FeedbackVector: collects feedback via ICs as explained above
 
+## TurboFan
+
+[watch TurboFan history](https://youtu.be/EdFDJANJJLs?t=10m22s) | [watch TurboFan goals](https://youtu.be/EdFDJANJJLs?t=11m44s)
+
+TurboFan is a simple compiler + backend responsible for the following:
+
+- instruction selection + scheduling
+- register allocation
+- code generation
+
+TurboFan is not just an optimizing compiler:
+
+- interpreter bytecode handlers run on top of TurboFan
+- builtins benefit from TurboFan
+- code stubs / IC subsystem runs on top of TurboFan
+- web assembly code generation (also runs on top of TurboFan)
+
+
+
 ## Speculative Optimization
 
 - main concept is the same as with old compiler chain, therefore [read this for more info](https://github.com/thlorenz/v8-perf/blob/master/compiler.md#optimizing-compiler-1)
 - compiler speculates that kinds of values seen in the past will be see in the future as well
 - generates optimized code just for those cases which is not only smaller but also executes at
   peak speed
-
-### Detailed Phases of Frontend, Optimization and Backend Stages
-
-<img alt="phases" src="http://benediktmeurer.de/images/2017/turbofan-20171213.png" width="70%">
-
-### Advantages Over Old Pipeline
-
-- more code can be optimized and inlined as crossing from JS to C++ land has been minimized
-  using techniques like CodeStubAssembler
-- for the same reason (and due to other improvements) TurboFan inlines code more aggressively,
-  leading to even more performance improvements
-- new language features are easier optimized which makes them useable after much shorter time
-  after they are introduced to v8 (previously performance issues for new features prevented
-  their use in code that needed to run fast)
 
 ### Add Example of Ignition and Feedback Vector
 
@@ -192,6 +289,8 @@ Return        ; end execution, return value in accum. reg. and tranfer control t
 ## Deoptimization
 
 ### Bailout
+
+[watch bailout example](https://youtu.be/u7zRSm8jzvA?t=26m43s) | [watch walk through TurboFan optimized code with bailouts](https://youtu.be/u7zRSm8jzvA?t=19m36s)
 
 - when assumptions made by optimizing compiler don't hold it bails out to deoptimized code
 - _code objects_ are verified via a `test` in the _prologue_ of the generated machine code for a
@@ -275,11 +374,28 @@ function usePoint(point) {
 
 - [optimization patterns part1](http://benediktmeurer.de/2017/06/20/javascript-optimization-patterns-part1/)
 
+### Inlining Functions
+
+[watch](https://youtu.be/u7zRSm8jzvA?t=26m12s)
+
+- smart heuristics, i.e. how many times was the function called so far
+
+## Sea Of Nodes
+
+- doesn't include total order of program, but dependencies between operations
+- total ordering is built from that so machine can execute it
+- entrypoints are TF optimizing compiler and WASM Compiler
+
 ## CodeStubAssembler
 
-- provides C++ based DSL to generate highly portable machne code
+[watch](https://youtu.be/M1FBosB5tjM?t=23m38s)
+
+- provides C++ based DSL to generate highly portable machine code
 - can generate highly efficient code for parts of slow-paths in JS without crossing to C++
   runtime
+- builtins are coded in that DSL
+- all interpreter bytecodes written using TurboFan
+- basis for fast builtins
 
 ### Improvements via CodeStubAssembler
 
@@ -290,14 +406,24 @@ function usePoint(point) {
 
 ## Facit
 
+[watch](https://youtu.be/M1FBosB5tjM?t=52m54s) | [watch](https://youtu.be/HDuSEbLWyOY?t=10m36s)
+
 - performance of your code is improved
-- write clean code with using idiomatic JavaScript and sensible data structures and it will run
-  fast
-- no need to work around architectural limitations of v8
+- less _anti patterns_ aka _you are holding it wrong_
+- write idiomatic, declarative JavaScript as in _easy to read_ JavaScript with good data structures and algorithms, including all language features (even functional ones) will execute with predictable, good performance
 - instead focus on your application design
+- now can handle exceptions where it makes sense as `try/catch/finally` no longer ruins the performance of a function
+- use appropriate collections as their performance is on par with the raw use of Objects for same task
+	- Maps, Sets, WeakMaps, WeakSets used where it makes sense results in easier maintainable JavaScript as they offer specific functionality to iterate over and inspect their values
+- avoid engine specific workarounds aka _CrankshaftScript_, instead file a bug report if you discover a bottleneck
 
 ## Resources
 
 - [V8: Behind the Scenes (November Edition)](http://benediktmeurer.de/2016/11/25/v8-behind-the-scenes-november-edition/)
 - [V8: Behind the Scenes (February Edition)](http://benediktmeurer.de/2017/03/01/v8-behind-the-scenes-february-edition/)
 - [An Introduction to Speculative Optimization in V8](http://benediktmeurer.de/2017/12/13/an-introduction-to-speculative-optimization-in-v8/)
+
+### Videos
+
+- [performance improvements in latest v8](https://youtu.be/HDuSEbLWyOY?t=4m58s)
+- [v8 and how it listens to you - ICs and FeedbackVectors](https://www.youtube.com/watch?v=u7zRSm8jzvA)
