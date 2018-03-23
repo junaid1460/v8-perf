@@ -8,6 +8,8 @@
 - optimized weak global handles
 - unified heap for full garbage collection
 - optimized v8's black allocation additions
+- reduced peak memory consumption of on-heap peak memory by up to 40% and off-heap peak memory
+  by 20% for low-memory devices by tuning several GC heuristics
 
 ## Resources
 
@@ -18,3 +20,5 @@
 - [Jank Busters Part Two: Orinoco](https://v8project.blogspot.com/2016/04/jank-busters-part-two-orinoco.html)
   _outdated_ except for paging, pointer tracking and black allocation?
 - [V8 Release 5.3](https://v8project.blogspot.com/2016/07/v8-release-53.html)
+- [V8 Release 5.4](https://v8project.blogspot.com/2016/09/v8-release-54.html)
+- [Optimizing V8 memory consumption](https://v8project.blogspot.com/2016/10/fall-cleaning-optimizing-v8-memory.html)

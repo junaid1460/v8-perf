@@ -74,3 +74,17 @@ into the inner workings of v8.
 ### Resources
 
 - [real world performance measurements](http://benediktmeurer.de/2016/12/20/v8-behind-the-scenes-december-edition/#real-world-performance-measurements)
+
+## Memory Visualization
+
+- v8 heap statistics feature provides insight into both the v8 managed heap and the C++ heap
+- `--trace-gc-object-stats` dumps memory-related statistics to the console
+- this data can be visualized via the [v8 heap visualizer](https://mlippautz.github.io/v8-heap-stats/)
+  - make sure to not log to _stdout_ when generating the `v8.gc_stats` file
+  - NOTE: when I tried this tool by loading a `v8.gc_stats` generated via
+  `node --trace-gc-object-stats script.js  > v8.gc_stats` it errored
+  - serving `v8 ./tools/heap-stats` locally had the same result
+
+### Resources
+
+- [Optimizing V8 memory consumption](https://v8project.blogspot.com/2016/10/fall-cleaning-optimizing-v8-memory.html)
