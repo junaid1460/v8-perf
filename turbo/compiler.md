@@ -13,7 +13,7 @@ pipleline is Node.js v8.
 - fast startup vs. peak performance
 - low memory vs. max optimization
 - Ignition Interpreter allows to run code with some amount of optimization very quickly and has
-  very low memory footprint 
+  very low memory footprint
 - TurboFan makes functions that run a lot fast, sacrificing some memory in the process
 
 ## Simplified Pipeline
@@ -50,6 +50,7 @@ pipleline is Node.js v8.
 - AST no longer source of truth that compilers need to agree on
 - AST much simpler and smaller in size
 - TurboFan uses Ignition bytecode directly to optimize (no re-parse needed)
+- bytecode is 25-50% the size of equivalent baseline machine code
 - combines cutting-edge IR (intermediate representation) with multi-layered translation +
   optimization pipeline
 - generates better quality machine code than Crankshaft JIT
@@ -112,7 +113,7 @@ pipleline is Node.js v8.
 - can address optimization killers that Crankshaft couldn't b/c it never supported fundamental techniques needed to do so
 - as a result no specific syntax (like `try/catch`) inside a function will cause it not being optimized
 - other subtle optimization killers that made performance unpredictable are no longer an issue and if they are they can be easily fixed in TF
-	- passing `undefined` as first parameter to `Math.max.apply` 
+	- passing `undefined` as first parameter to `Math.max.apply`
 	- mixing strict and sloppy modes
 - easier to support future JavaScript features as the JavaScript frontend is clearly separated
   from the architecture dependent backends
@@ -142,14 +143,25 @@ pipleline is Node.js v8.
 
 ## Ignition Interpreter
 
-[watch](https://youtu.be/EdFDJANJJLs?t=13m16s)
+[watch](https://youtu.be/EdFDJANJJLs?t=13m16s) | [read](https://v8project.blogspot.com/2016/08/firing-up-ignition-interpreter.html)
 
+- uses TurboFan's low-level architecture-independent macro-assembly instructions to generate
+  bytecode handlers for each _opcode_
+- TurboFan compiles these instructions to target architecture including low-level instruction
+  selection and machine register allocation
+- bytecode passes through inline-optimization stages as it is generated
+  - common patterns replaced with faster sequences
+  - redundant operations removed
+  - minimize number of register transfers
+- this results in highly optimized and small interpreter code which can execute the bytecode instructions
+  and interact with rest of v8 VM in low overhead manner
 - Ignition Interpreter uses a [register machine](https://en.wikipedia.org/wiki/Register_machine)
-  instead of stack machine used previously
+  with each bytecode specifying inputs and outputs as explicit register operands
 - holds its local state in _interpreter registers_
   - some map to _real_ CPU registers
   - others map to specific slots in native machine _stack memory_
-- last computed value of each bytecode is kept in special _accumulator_ register
+- last computed value of each bytecode is kept in special _accumulator_ register minimizing
+  load/store operations (from/to explicit registers)
 - current stack frame is identified by stack pointer
 - program counter points to currently executed instruction in the bytecode
 
@@ -225,8 +237,14 @@ pipleline is Node.js v8.
 TurboFan is a simple compiler + backend responsible for the following:
 
 - instruction selection + scheduling
+  - innovative scheduling algorithm makes use of reordering freedom ([sea of nodes]()) to move
+    code out of loops into less frequently executed paths
 - register allocation
 - code generation
+- generates fast code via _speculative optimization_ from the feedback collected while running
+  unoptimized bytecode
+- architecture specific optimizatinos exploit features of each target platform for best quality
+  code
 
 TurboFan is not just an optimizing compiler:
 
