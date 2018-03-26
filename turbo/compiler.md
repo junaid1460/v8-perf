@@ -15,6 +15,8 @@ pipleline is Node.js v8.
 - Ignition Interpreter allows to run code with some amount of optimization very quickly and has
   very low memory footprint
 - TurboFan makes functions that run a lot fast, sacrificing some memory in the process
+- designed to support entire JavaScript language and make it possible to quickly add new
+  features and to optimize them fast and incrementally
 
 ## Simplified Pipeline
 
@@ -413,7 +415,9 @@ function usePoint(point) {
   runtime
 - builtins are coded in that DSL
 - all interpreter bytecodes written using TurboFan
-- basis for fast builtins
+- entry-point stubs into C++ can easily be called from CSA
+- very fast property accesses
+- basis for fast builtins, i.e. [faster Regular Expressions](./js-feature-improvements.md#regular-expressions)
 
 ### Improvements via CodeStubAssembler
 
@@ -440,6 +444,7 @@ function usePoint(point) {
 - [V8: Behind the Scenes (November Edition)](http://benediktmeurer.de/2016/11/25/v8-behind-the-scenes-november-edition/)
 - [V8: Behind the Scenes (February Edition)](http://benediktmeurer.de/2017/03/01/v8-behind-the-scenes-february-edition/)
 - [An Introduction to Speculative Optimization in V8](http://benediktmeurer.de/2017/12/13/an-introduction-to-speculative-optimization-in-v8/)
+- [High-performance ES2015 and beyond](https://v8project.blogspot.com/2017/02/high-performance-es2015-and-beyond.html)
 
 ### Videos
 

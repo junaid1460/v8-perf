@@ -193,6 +193,10 @@ for (const prop in obj) {
 - _enum cache_ needed to be adapted so TurboFan knew when it could safely use _enum cache
   indices_ in order to avoid deoptimization loop (that also affected crankshaft)
 - _constant folding_ was ported to TurboFan
+- separate _KeyAccumulator_ was introduced to deal with complexities of collecting keys for
+  `for-in`
+- _KeyAccumulator_ consists of fast part which support limited set of `for-in` actions and slow part which
+  supports all complex cases like ES6 Proxies
 - coupled with other TurboFan+Ignition advantages this led to ~60% speedup of the above case
 
 ### Facit
@@ -205,6 +209,7 @@ for (const prop in obj) {
 
 - [Restoring for..in peak performance](http://benediktmeurer.de/2017/09/07/restoring-for-in-peak-performance/)
 - [Require Guarding for-in](https://eslint.org/docs/rules/guard-for-in)
+- [Fast For-In in V8](https://v8project.blogspot.com/2017/03/fast-for-in-in-v8.html)
 
 ## Object Constructor Subclassing and Class Factories
 
@@ -276,3 +281,53 @@ const FooBar = createClassBasedOn(Bar)
 ### Resources
 
 - [Improve performance of Object.is](http://benediktmeurer.de/2017/10/05/connecting-the-dots/#improve-performance-of-objectis)
+
+## Regular Expressions
+
+- migrated away from JavaScript to minimize overhead that hurt performance in previous
+  implementation
+- new design based on [CodeStubAssembler](compiler.md#codestubassembler)
+- entry-point stub into RegExp engine can easily be called from CodeStubAssembler
+- make sure to neither modify the `RegExp` instance or its prototype as that will interfere
+  with optimizations applied to regex operations
+
+### Resources
+
+- [Speeding up V8 Regular Expressions](https://v8project.blogspot.com/2017/01/speeding-up-v8-regular-expressions.html)
+
+## Destructuring
+
+- _array destructuring_ performance on par with _naive_ ES5 equivalent
+
+### Facit
+
+- employ destructuring syntax freely in your applications
+
+### Resources
+
+- [High-performance ES2015 and beyond](https://v8project.blogspot.com/2017/02/high-performance-es2015-and-beyond.html)
+
+## Promises Async/Await
+
+- native Promises in v8 have seen huge performance improvements as well as their use via
+  `async/await`
+- v8 exposes C++ API allowing to trace through Promise lifecycle which is used by Node.js API
+  to provide insight into Promise execution
+- DevTools async stacktraces make Promise debugging a lot easier
+- DevTools _pause on exception_ breaks immediately when a Promise `reject` is invoked
+
+### Resources
+
+- [V8 Release 5.7](https://v8project.blogspot.com/2017/02/v8-release-57.html)k
+
+## Generators
+
+- weren't optimizable in the past due to control flow limitations in Crankshaft
+- new compiler chain generates bytecodes which de-sugar complex generator control flow into
+  simpler local-control flow bytecodes
+- these resulting bytecodes are easily optimized by TurboFan without knowing anything specific
+  about generator control flow
+
+### Resources
+
+- [High-performance ES2015 and beyond](https://v8project.blogspot.com/2017/02/high-performance-es2015-and-beyond.html)
