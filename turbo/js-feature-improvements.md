@@ -26,10 +26,8 @@
 ### Resources
 
 - [A new approach to Function.prototype.bind](http://benediktmeurer.de/2015/12/25/a-new-approach-to-function-prototype-bind/)
-- [Optimizing bound functions
-  further](http://benediktmeurer.de/2016/01/14/optimizing-bound-functions-further/)
-- [bound function exotic
-  objects](https://tc39.github.io/ecma262/#sec-bound-function-exotic-objects)
+- [Optimizing bound functions further](http://benediktmeurer.de/2016/01/14/optimizing-bound-functions-further/)
+- [bound function exotic objects](https://tc39.github.io/ecma262/#sec-bound-function-exotic-objects)
 
 ## instanceof and @@hasInstance
 
@@ -59,12 +57,23 @@
 - [V8: Behind the Scenes (November Edition)](http://benediktmeurer.de/2016/11/25/v8-behind-the-scenes-november-edition/)
 - [Investigating Performance of Object#toString in ES2015](http://benediktmeurer.de/2017/08/14/investigating-performance-object-prototype-to-string-es2015/)
 
+## Reflection API
+
+- `Reflect.apply` and `Reflect.construct` received 17x performance boost in v8 v6.1 and
+  therefore should be considered performant at this point
+
+### Resources
+
+- [V8 Release 6.1](https://v8project.blogspot.com/2017/08/v8-release-61.html)
+
 ## Array Builtins
 
 - `Array` builtins like `map` and `forEach` can be inlined into TurboFan optimized code which
   results in considerable performance improvement
+- optimizations are applied to all _major non-holey_ elements kinds
 
 - [V8: Behind the Scenes (February Edition)](http://benediktmeurer.de/2017/03/01/v8-behind-the-scenes-february-edition/)
+- [V8 Release 6.1](https://v8project.blogspot.com/2017/08/v8-release-61.html)
 
 ## const
 
@@ -118,8 +127,9 @@
 ### Resources
 
 - [Faster Collection Iterators](http://benediktmeurer.de/2017/07/14/faster-collection-iterators/)
+- [V8 Release 6.1](https://v8project.blogspot.com/2017/08/v8-release-61.html)
 
-## Iterating Maps and Sets via Callbacks
+## Iterating Maps and Sets via `forEach` and Callbacks
 
 - both `Map`s and `Set`s provide a `forEach` method which allows iterating over it's items by
   providing a callback
@@ -149,6 +159,7 @@
 ### Resources
 
 - [Faster Collection Iterators - Callback Based Iteration](http://benediktmeurer.de/2017/07/14/faster-collection-iterators/#callback-based-iteration)
+- [V8 Release 6.1](https://v8project.blogspot.com/2017/08/v8-release-61.html)
 
 ## Iterating Object properties via for in
 

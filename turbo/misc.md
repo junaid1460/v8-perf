@@ -17,7 +17,9 @@ NOTE: most likely superceded by [custom startup snapshots](#custom-startup-snaps
 
 - [Code caching](https://v8project.blogspot.com/2015/07/code-caching.html)
 
-## Custom Startup Snapshots
+## Startup Snapshots
+
+### Custom Startup Snapshots
 
 - v8 uses snapshots and lazy deserialization to _retrieve_ previously optimized code for builtin
   functions
@@ -31,7 +33,6 @@ NOTE: most likely superceded by [custom startup snapshots](#custom-startup-snaps
 - serializer cannot _directly_ capture state outside of v8, thus outside state needs to be
   attached to a JavaScript object via _embedder fields_
 
-
 TODO: notes from more up to date post
 
 ### Resources
@@ -40,3 +41,4 @@ TODO: notes from more up to date post
   slightly out of date as embedder API changed and lazy deserialization was introduced
 - [Energizing Atom with V8's custom start-up snapshot](https://v8project.blogspot.com/2017/05/energizing-atom-with-v8s-custom-start.html)
 - [lazy deserialization](https://v8project.blogspot.com/2018/02/lazy-deserialization.html)
+

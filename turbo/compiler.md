@@ -445,6 +445,7 @@ function usePoint(point) {
 - [V8: Behind the Scenes (February Edition)](http://benediktmeurer.de/2017/03/01/v8-behind-the-scenes-february-edition/)
 - [An Introduction to Speculative Optimization in V8](http://benediktmeurer.de/2017/12/13/an-introduction-to-speculative-optimization-in-v8/)
 - [High-performance ES2015 and beyond](https://v8project.blogspot.com/2017/02/high-performance-es2015-and-beyond.html)
+- [Launching Ignition and TurboFan](https://v8project.blogspot.com/2017/05/launching-ignition-and-turbofan.html)
 
 ### Videos
 
