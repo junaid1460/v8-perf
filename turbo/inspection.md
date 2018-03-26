@@ -88,3 +88,42 @@ into the inner workings of v8.
 ### Resources
 
 - [Optimizing V8 memory consumption](https://v8project.blogspot.com/2016/10/fall-cleaning-optimizing-v8-memory.html)
+
+## Array Elements Kinds
+
+- enable native functions via `--allow-natives-syntax`
+- then use `%DebugPrint(array)` to dump information about this array to the console
+- the `elements` field will hold information about the _elements kinds_ of the array
+
+**Sample Output** (abreviated)
+
+```
+DebugPrint: 0x1fbbad30fd71: [JSArray]
+ - map = 0x10a6f8a038b1 [FastProperties]
+ - prototype = 0x1212bb687ec1
+ - elements = 0x1fbbad30fd19 <FixedArray[3]> [PACKED_SMI_ELEMENTS (COW)]
+ - length = 3
+ - properties = 0x219eb0702241 <FixedArray[0]> {
+    #length: 0x219eb0764ac9 <AccessorInfo> (const accessor descriptor)
+ }
+ - elements= 0x1fbbad30fd19 <FixedArray[3]> {
+           0: 1
+           1: 2
+           2: 3
+ }
+[…]
+```
+
+- `--trace-elements-transitions` dumps elements transitions taking place to the console
+
+**Sample Output**
+
+```
+elements transition [PACKED_SMI_ELEMENTS -> PACKED_DOUBLE_ELEMENTS] 
+  in ~+34 at x.js:2 for 0x1df87228c911 <JSArray[3]>
+  from 0x1df87228c889 <FixedArray[3]> to 0x1df87228c941 <FixedDoubleArray[22]>
+```
+
+### Resources
+
+- ["Elements kinds" in V8](https://v8project.blogspot.com/2017/09/elements-kinds-in-v8.html)

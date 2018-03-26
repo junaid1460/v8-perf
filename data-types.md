@@ -321,6 +321,8 @@ Point.prototype.pointDistance = function () { /* calculates distance */ }
 
 [read](http://jayconrod.com/posts/52/a-tour-of-v8-object-representation) *Numbered properties: fast elements*
 
+[read]((https://v8project.blogspot.com/2017/08/fast-properties.html)
+
 - v8 has two methods for storing arrays, *fast elements* and *dictionary elements* 
 
 ### Fast Elements
@@ -329,16 +331,50 @@ Point.prototype.pointDistance = function () { /* calculates distance */ }
 
 - compact keysets
 - linear storage buffer
-- fast *elements kinds* in order of increasing generality:
-  - fast SMIs (small integers)
-  - fast doubles (Doubles stored in unboxed representation)
-  - fast values (strings or other objects)
 
 #### Characteristics
 
 - contiguous (non-sparse)
 - `0` based
 - smaller than `100K` elements [see this test](https://github.com/thlorenz/v8-perf/blob/master/test/fast-elements.js)
+
+#### Packed vs. Holey Elements
+
+- v8 makes distinction whether the elements backing store is packed or has holes
+- holes in a backing store are created by deleting an indexed element
+- missing properties are marked with special _hole_ value to keep Array functions performant
+- however missing properties cause expensive lookups on prototype chain
+- in the past reading beyond the length of an array made it holey, however this has been fixed
+  and is no longer a problem (TODO: resource)
+
+#### Elements Kinds
+
+[read](https://v8project.blogspot.com/2017/09/elements-kinds-in-v8.html)
+
+- fast *elements kinds* in order of increasing generality:
+  - fast SMIs (small integers)
+  - fast doubles (Doubles stored in unboxed representation)
+  - fast values (strings or other objects)
+
+##### Elements Kind Lattice
+
+```
++--------------------+ 
+| PACKED_SMI_ELEMENT |---+ 
++--------------------+   |    +------------------------+
+          |              +--->| PACKED_DOUBLE_ELEMENTS |---+ 
+          ↓                   +------------------------+   |    +-------------------+
++--------------------+                   |                 +--->|  PACKED_ELEMENTS  |
+| HOLEY_SMI_ELEMENTS |---+               ↓                      +-------------------+
++--------------------+   |    +------------------------+                   |
+                         +--->|  HOLEY_DOUBLE_ELEMENTS |---+               ↓
+                              +------------------------+   |    +-------------------+
+                                                           +--->|  HOLEY_ELEMENTS   |
+                                                                +-------------------+
+```
+
+- can only transition downwards through the lattice
+- more specific elements kinds enable more fine-grained optimizations
 
 ### Dictionary Elements
 
@@ -382,16 +418,20 @@ Point.prototype.pointDistance = function () { /* calculates distance */ }
 
 ### Considerations
 
+- once array is marked as holey it is holey forever
 - don't pre-allocate large arrays (`>=100K` elements), instead grow as needed, to avoid them being considered sparse
 - do pre-allocate small arrays to correct size to avoid allocations due to resizing
-- don't delete elements
+- avoid createing holes, and thus don't delete elements
 - don't load uninitialized or deleted elements [watch](http://youtu.be/UJPdhx5zTaw?t=19m30s) |
   [slide](http://v8-io12.appspot.com/index.html#43)
 - use literal initializer for Arrays with mixed values
 - don't store non-numeric valuse in numeric arrays
   - causes boxing and efficient code that was generated for manipulating values can no longer be used
-- use typed arrays whenever possible
+- use typed arrays whenever possible especially when performing mathematical operations on an
+  array of numbers
 - copying an array, you should avoid copying from the back (higher indices to lower indices) because this will almost certainly trigger dictionary mode
+- avoid elements kind transitions, i.e. edge case of adding `-0, NaN, Infinity` to a SMI array
+  as they are represented as doubles
 
 ## Strings
 
@@ -413,3 +453,5 @@ map |len |hash|characters
 - [tour of v8: garbage collection - 2013](http://jayconrod.com/posts/55/a-tour-of-v8-garbage-collection)
 - [tour of v8: object representation - 2013](http://jayconrod.com/posts/52/a-tour-of-v8-object-representation)
 - [v8-design](https://developers.google.com/v8/design#garb_coll)
+- [Fast Properties in V8 - 2017](https://v8project.blogspot.com/2017/08/fast-properties.html)
+- [“Elements kinds” in V8 - 2017](https://v8project.blogspot.com/2017/09/elements-kinds-in-v8.html)
