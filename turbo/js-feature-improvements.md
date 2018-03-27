@@ -25,8 +25,8 @@
 
 ### Resources
 
-- [A new approach to Function.prototype.bind](http://benediktmeurer.de/2015/12/25/a-new-approach-to-function-prototype-bind/)
-- [Optimizing bound functions further](http://benediktmeurer.de/2016/01/14/optimizing-bound-functions-further/)
+- [A new approach to Function.prototype.bind - 2015](http://benediktmeurer.de/2015/12/25/a-new-approach-to-function-prototype-bind/)
+- [Optimizing bound functions further - 2016](http://benediktmeurer.de/2016/01/14/optimizing-bound-functions-further/)
 - [bound function exotic objects](https://tc39.github.io/ecma262/#sec-bound-function-exotic-objects)
 
 ## instanceof and @@hasInstance
@@ -54,8 +54,8 @@
 
 ### Resources
 
-- [V8: Behind the Scenes (November Edition)](http://benediktmeurer.de/2016/11/25/v8-behind-the-scenes-november-edition/)
-- [Investigating Performance of Object#toString in ES2015](http://benediktmeurer.de/2017/08/14/investigating-performance-object-prototype-to-string-es2015/)
+- [V8: Behind the Scenes (November Edition) - 2016](http://benediktmeurer.de/2016/11/25/v8-behind-the-scenes-november-edition/)
+- [Investigating Performance of Object#toString in ES2015 - 2017](http://benediktmeurer.de/2017/08/14/investigating-performance-object-prototype-to-string-es2015/)
 
 ## Reflection API
 
@@ -64,7 +64,7 @@
 
 ### Resources
 
-- [V8 Release 6.1](https://v8project.blogspot.com/2017/08/v8-release-61.html)
+- [V8 Release 6.1 - 2017](https://v8project.blogspot.com/2017/08/v8-release-61.html)
 
 ## Array Builtins
 
@@ -72,8 +72,8 @@
   results in considerable performance improvement
 - optimizations are applied to all _major non-holey_ elements kinds
 
-- [V8: Behind the Scenes (February Edition)](http://benediktmeurer.de/2017/03/01/v8-behind-the-scenes-february-edition/)
-- [V8 Release 6.1](https://v8project.blogspot.com/2017/08/v8-release-61.html)
+- [V8: Behind the Scenes (February Edition) - 2017](http://benediktmeurer.de/2017/03/01/v8-behind-the-scenes-february-edition/)
+- [V8 Release 6.1 - 2017](https://v8project.blogspot.com/2017/08/v8-release-61.html)
 
 ## const
 
@@ -93,7 +93,7 @@
 
 ### Resources
 
-- [JavaScript Optimization Patterns (Part 2)](http://benediktmeurer.de/2017/06/29/javascript-optimization-patterns-part2/)
+- [JavaScript Optimization Patterns (Part 2) - 2017](http://benediktmeurer.de/2017/06/29/javascript-optimization-patterns-part2/)
 
 ## Iterating Maps and Sets via `for of`
 
@@ -126,8 +126,8 @@
 
 ### Resources
 
-- [Faster Collection Iterators](http://benediktmeurer.de/2017/07/14/faster-collection-iterators/)
-- [V8 Release 6.1](https://v8project.blogspot.com/2017/08/v8-release-61.html)
+- [Faster Collection Iterators - 2017](http://benediktmeurer.de/2017/07/14/faster-collection-iterators/)
+- [V8 Release 6.1 - 2017](https://v8project.blogspot.com/2017/08/v8-release-61.html)
 
 ## Iterating Maps and Sets via `forEach` and Callbacks
 
@@ -158,8 +158,8 @@
 
 ### Resources
 
-- [Faster Collection Iterators - Callback Based Iteration](http://benediktmeurer.de/2017/07/14/faster-collection-iterators/#callback-based-iteration)
-- [V8 Release 6.1](https://v8project.blogspot.com/2017/08/v8-release-61.html)
+- [Faster Collection Iterators - Callback Based Iteration - 2017](http://benediktmeurer.de/2017/07/14/faster-collection-iterators/#callback-based-iteration)
+- [V8 Release 6.1 - 2017](https://v8project.blogspot.com/2017/08/v8-release-61.html)
 
 ## Iterating Object properties via for in
 
@@ -218,9 +218,9 @@ for (const prop in obj) {
 
 ### Resources
 
-- [Restoring for..in peak performance](http://benediktmeurer.de/2017/09/07/restoring-for-in-peak-performance/)
+- [Restoring for..in peak performance - 2017](http://benediktmeurer.de/2017/09/07/restoring-for-in-peak-performance/)
 - [Require Guarding for-in](https://eslint.org/docs/rules/guard-for-in)
-- [Fast For-In in V8](https://v8project.blogspot.com/2017/03/fast-for-in-in-v8.html)
+- [Fast For-In in V8 - 2017](https://v8project.blogspot.com/2017/03/fast-for-in-in-v8.html)
 
 ## Object Constructor Subclassing and Class Factories
 
@@ -251,7 +251,7 @@ const FooBar = createClassBasedOn(Bar)
 
 ### Resources
 
-- [Optimize Object constructor subclassing](http://benediktmeurer.de/2017/10/05/connecting-the-dots/#optimize-object-constructor-subclassing)
+- [Optimize Object constructor subclassing - 2017](http://benediktmeurer.de/2017/10/05/connecting-the-dots/#optimize-object-constructor-subclassing)
 
 ## Tagged Templates
 
@@ -260,7 +260,7 @@ const FooBar = createClassBasedOn(Bar)
 
 ### Resources
 
-- [optimize tagged templates](http://benediktmeurer.de/2017/10/05/connecting-the-dots/#optimize-tagged-templates)
+- [optimize tagged templates - 2017](http://benediktmeurer.de/2017/10/05/connecting-the-dots/#optimize-tagged-templates)
 
 ## Typed Arrays and ArrayBuffer
 
@@ -281,7 +281,7 @@ const FooBar = createClassBasedOn(Bar)
 
 ### Resources
 
-- [Connecting the dots](http://benediktmeurer.de/2017/10/05/connecting-the-dots)
+- [Connecting the dots - 2017](http://benediktmeurer.de/2017/10/05/connecting-the-dots)
 
 ## Object.is
 
@@ -291,7 +291,7 @@ const FooBar = createClassBasedOn(Bar)
 
 ### Resources
 
-- [Improve performance of Object.is](http://benediktmeurer.de/2017/10/05/connecting-the-dots/#improve-performance-of-objectis)
+- [Improve performance of Object.is - 2017](http://benediktmeurer.de/2017/10/05/connecting-the-dots/#improve-performance-of-objectis)
 
 ## Regular Expressions
 
@@ -304,7 +304,7 @@ const FooBar = createClassBasedOn(Bar)
 
 ### Resources
 
-- [Speeding up V8 Regular Expressions](https://v8project.blogspot.com/2017/01/speeding-up-v8-regular-expressions.html)
+- [Speeding up V8 Regular Expressions - 2017](https://v8project.blogspot.com/2017/01/speeding-up-v8-regular-expressions.html)
 
 ## Destructuring
 
@@ -316,7 +316,7 @@ const FooBar = createClassBasedOn(Bar)
 
 ### Resources
 
-- [High-performance ES2015 and beyond](https://v8project.blogspot.com/2017/02/high-performance-es2015-and-beyond.html)
+- [High-performance ES2015 and beyond - 2017](https://v8project.blogspot.com/2017/02/high-performance-es2015-and-beyond.html)
 
 ## Promises Async/Await
 
@@ -329,7 +329,7 @@ const FooBar = createClassBasedOn(Bar)
 
 ### Resources
 
-- [V8 Release 5.7](https://v8project.blogspot.com/2017/02/v8-release-57.html)k
+- [V8 Release 5.7 - 2017](https://v8project.blogspot.com/2017/02/v8-release-57.html)k
 
 ## Generators
 
@@ -341,4 +341,4 @@ const FooBar = createClassBasedOn(Bar)
 
 ### Resources
 
-- [High-performance ES2015 and beyond](https://v8project.blogspot.com/2017/02/high-performance-es2015-and-beyond.html)
+- [High-performance ES2015 and beyond - 2017](https://v8project.blogspot.com/2017/02/high-performance-es2015-and-beyond.html)
