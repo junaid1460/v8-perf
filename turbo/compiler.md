@@ -420,19 +420,47 @@ function usePoint(point) {
 
 ## CodeStubAssembler
 
-[watch](https://youtu.be/M1FBosB5tjM?t=23m38s)
+[watch](https://youtu.be/M1FBosB5tjM?t=23m38s) |
+[read](https://v8project.blogspot.com/2017/11/csa.html) |
+[slides](https://docs.google.com/presentation/d/1u6bsgRBqyVY3RddMfF1ZaJ1hWmqHZiVMuPRw_iKpHlY/edit#slide=id.g17a3a2e7fd_0_114)
 
-- provides C++ based DSL to generate highly portable machine code
+### What is the CodeStubAssember aka CSA?
+
+- defines a portable assembly language built on top of TurboFan's backend and adds a C++ based
+  API to generate highly portable TurboFan machine-level IR directly
 - can generate highly efficient code for parts of slow-paths in JS without crossing to C++
   runtime
-- builtins are coded in that DSL
-- all interpreter bytecodes written using TurboFan
-- entry-point stubs into C++ can easily be called from CSA
+- API includes very low-level operations (pretty much assembly), _primitive_ CSA instructions
+  that translate directly into one or twy assembly instructions
+- Macros include fixed set of pre-defined CSA instructions corresponding to most commonly used
+  assembly instructions
+
+![CSA pipeline](https://1.bp.blogspot.com/-mWTltdSfO1c/Wg2f-CyCWqI/AAAAAAAAA5E/VOKT8nTzxpQMsZ0Wt-mzB1ivYU2NLg_-gCLcBGAs/s1600/csa.png)
+_CSA and JavaScript compilation pipelines_
+
+### Why is it a Game Changer?
+
+The CSA allows much faster iteration when implementing and optimizing new language features due
+to the following characteristics.
+
+- CSA includes type verification at IR level to catch many correctness bugs at compile time
+- CSA's instruction selector ensures that optimal code is generated on all platforms
+- CSA's performs register allocations automatically
+- CSA understands API calling conventions, both standard C++ and internal v8 register-based,
+  i.e. entry-point stubs into C++ can easily be called from CSA,  making trivial to
+  interoperate between CSA generated code and other parts of v8
+- CSA-based built in functionality can easily be inlined into Ignition bytecode handlers to
+  improve its performance
+- builtins are coded in that DSL (no longer [self hosted](https://en.wikipedia.org/wiki/Self-hosting))
 - very fast property accesses
-- basis for fast builtins, i.e. [faster Regular Expressions](./js-feature-improvements.md#regular-expressions)
 
-### Improvements via CodeStubAssembler
+#### Improvements via CodeStubAssembler
 
+CSA is the basis for fast builtins and thus was used to speed up multiple builtins. Below are a
+few examples.
+
+-  [faster Regular Expressions](./js-feature-improvements.md#regular-expressions) sped up by
+   removing need to switch between C++ and JavaScript runtimes
 - `Object.create` has predictable performance by using CodeStubAssembler
 - `Function.prototype.bind` archieved final boost when ported to CodeStubAssembler for a total
   60,000% improvement
@@ -459,6 +487,11 @@ function usePoint(point) {
 - [High-performance ES2015 and beyond - 2017](https://v8project.blogspot.com/2017/02/high-performance-es2015-and-beyond.html)
 - [Launching Ignition and TurboFan - 2017](https://v8project.blogspot.com/2017/05/launching-ignition-and-turbofan.html)
 - [lazy unlinking of deoptimized functions - 2017](https://v8project.blogspot.com/2017/10/lazy-unlinking.html)
+- [Taming architecture complexity in V8 — the CodeStubAssembler - 2017](https://v8project.blogspot.com/2017/11/csa.html)
+
+### Slides
+
+- [CodeStubAssembler: Redux - 2016](https://docs.google.com/presentation/d/1u6bsgRBqyVY3RddMfF1ZaJ1hWmqHZiVMuPRw_iKpHlY/edit#slide=id.p)
 
 ### Videos
 
