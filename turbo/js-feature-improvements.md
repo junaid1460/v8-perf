@@ -342,3 +342,28 @@ const FooBar = createClassBasedOn(Bar)
 ### Resources
 
 - [High-performance ES2015 and beyond - 2017](https://v8project.blogspot.com/2017/02/high-performance-es2015-and-beyond.html)
+
+## Proxies
+
+- [proxies](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
+  required 4 jumps between C++ and JavaScript runtimes in the previous v8 compiler
+  implementation
+- porting C++ bits to [CodeStubAssembler](compiler.md#codestubassembler) allows all execution
+  to happen inside the JavaScript runtime, resulting in 0 jumps between runtimes
+- this sped up numerous proxy operations
+  - constructing proxies 49%-74% improvement
+  - calling proxies upt to 500% improvement
+  - [has trap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/has)
+    71%-428% improvement, larger improvement when trap is present
+  - [set trap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/set)
+    27%-438% improvement, larger improvement when trap is set
+
+### Facit
+
+- while the use of proxies does incurr an overhead, that overhead has been reduced drastically,
+  but still should be avoided in hot code paths
+- however use proxies whenever the problem you're trying to solve calls for it
+
+### Resources
+
+- [Optimizing ES2015 proxies in V8 - 2017](https://v8project.blogspot.com/2017/10/optimizing-proxies.html)
