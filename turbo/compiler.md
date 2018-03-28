@@ -20,7 +20,12 @@ pipleline is Node.js v8.
 
 ## Simplified Pipeline
 
-- once crankshaft was taken out of the mix the below pipeline was possible
+[slide: pipeline 2010](https://docs.google.com/presentation/d/1_eLlVzcj94_G4r9j9d_Lj5HRKFnq6jgpuPJtnmIBs88/edit#slide=id.g2134da681e_0_163) |
+[slide: pipeline 2014](https://docs.google.com/presentation/d/1_eLlVzcj94_G4r9j9d_Lj5HRKFnq6jgpuPJtnmIBs88/edit#slide=id.g2134da681e_0_220) |
+[slide: pipeline 2016](https://docs.google.com/presentation/d/1_eLlVzcj94_G4r9j9d_Lj5HRKFnq6jgpuPJtnmIBs88/edit#slide=id.g2134da681e_0_249) |
+[slide: pipeline 2017](https://docs.google.com/presentation/d/1_eLlVzcj94_G4r9j9d_Lj5HRKFnq6jgpuPJtnmIBs88/edit#slide=id.g2134da681e_0_125)
+
+Once crankshaft was taken out of the mix the below pipeline was possible
 
 <img alt="simplified pipeline" src="http://benediktmeurer.de/images/2016/v8-new-pipeline-20161125.png" width="70%">
 
@@ -42,6 +47,8 @@ pipleline is Node.js v8.
 
 ### Detailed Phases of Frontend, Optimization and Backend Stages
 
+[slide](https://docs.google.com/presentation/d/1H1lLsbclvzyOF3IUR05ZUaZcqDxo7_-8f4yJoxdMooU/edit#slide=id.g18ceb14729_0_135)
+
 <img alt="phases" src="http://benediktmeurer.de/images/2017/turbofan-20171213.png" width="70%">
 
 ## Advantages Over Old Pipeline
@@ -55,12 +62,12 @@ pipleline is Node.js v8.
 - bytecode is 25-50% the size of equivalent baseline machine code
 - combines cutting-edge IR (intermediate representation) with multi-layered translation +
   optimization pipeline
-- generates better quality machine code than Crankshaft JIT
+- relaxed [sea of nodes]() (IR) allows more effective reordering and optimization
 - to achieve that fluid code motion, control flow optimizations and precise numerical range
   analysis are used
 - clearer separation between JavaScript, v8 and the target architectures allows cleaner, more
   robust generated code and adds flexibility
-- relaxed [sea of nodes]() (IR) allows more effective reordering and optimization
+- generates better quality machine code than Crankshaft JIT
 - crossing from JS to C++ land has been minimized using techniques like CodeStubAssembler
 - as a result optimizations can be applied in more cases and are attempted more aggressively
 - for the same reason (and due to other improvements) TurboFan inlines code more aggressively,
@@ -255,8 +262,6 @@ TurboFan is not just an optimizing compiler:
 - code stubs / IC subsystem runs on top of TurboFan
 - web assembly code generation (also runs on top of TurboFan)
 
-
-
 ## Speculative Optimization
 
 - main concept is the same as with old compiler chain, therefore [read this for more info](https://github.com/thlorenz/v8-perf/blob/master/compiler.md#optimizing-compiler-1)
@@ -299,6 +304,8 @@ Return        ; end execution, return value in accum. reg. and tranfer control t
 
 #### Feedback Used To Optimize Code
 
+[slides](https://docs.google.com/presentation/d/1wZVIqJMODGFYggueQySdiA3tUYuHNMcyp_PndgXsO1Y/edit#slide=id.g19e50fc32a_1_24)
+
 - the `[0]` of `Add a0, [0]` refers to _feedback vector slot_ where Ignition stores profiling
   info which later is used by TurboFan to optimize the function
 - `+` operator needs to perform a huge amount of checks to cover all cases, but if we assume
@@ -307,6 +314,9 @@ Return        ; end execution, return value in accum. reg. and tranfer control t
   eliminate the expression as part of the optimization
 
 ## Deoptimization
+
+[slides](https://docs.google.com/presentation/d/1Z6oCocRASCfTqGq1GCo1jbULDGS-w-nzxkbVF7Up0u0/edit#slide=id.p) |
+[slides](https://docs.google.com/presentation/d/1wZVIqJMODGFYggueQySdiA3tUYuHNMcyp_PndgXsO1Y/edit#slide=id.g19ee040be6_0_180)
 
 ### Bailout
 
@@ -345,7 +355,7 @@ jnz Deoptimize                  ; if not bail
 [ .. ]                          ; do some nifty conversions via shifts
                                 ; and store results in rdx and rcx
 
-addl rdx, rcx                   ; perform add and including overflow check
+addl rdx, rcx                   ; perform add including overflow check
 jo Deoptimize                   ; if overflowed bail
 
 [ .. ]                          ; cleanup and return to caller
@@ -425,15 +435,45 @@ function usePoint(point) {
 
 ## Sea Of Nodes
 
+[watch](https://youtu.be/KiWEWLwQ3oI?t=34s) |
+[slides](https://docs.google.com/presentation/d/1sOEF4MlF7LeO7uq-uThJSulJlTh--wgLeaVibsbb3tc/edit#slide=id.g5499b9c42_074) |
+[slides](https://docs.google.com/presentation/d/1sOEF4MlF7LeO7uq-uThJSulJlTh--wgLeaVibsbb3tc/edit#slide=id.g5499b9c42_0105)
+
 - doesn't include total order of program, but dependencies between operations
-- total ordering is built from that so machine can execute it
-- entrypoints are TF optimizing compiler and WASM Compiler
+- instead expresses many possible legal orderings of code
+- most efficient ordering and placement can be derived from the _nodes_
+  - depends on control dominance, loop nesting, register pressure
+- total ordering (traditional CFG) is built from that, so code can be generated and registers
+  allocated
+- entrypoints are TurboFan optimizing compiler and WASM Compiler
+
+### Advantages
+
+[slide](https://docs.google.com/presentation/d/1H1lLsbclvzyOF3IUR05ZUaZcqDxo7_-8f4yJoxdMooU/edit#slide=id.g18ceb14729_0_92)
+
+Flexibility of sea of nodes approach enables the below optimizations.
+
+- better redundant code elimination due to more code motion
+- loop peeling
+- load/check elimination
+- escape analysis [watch](https://youtu.be/KiWEWLwQ3oI?t=7m13s)
+  - eliminates non-escaping allocations
+  - aggregates like `const o = { foo: 1, bar: 2}` are replaces with scalars like
+    `const o_foo = 1; const o_bar = 2`
+- representation selection
+  - optimizing of number representation via type and range analysis
+  - [slides](https://docs.google.com/presentation/d/1sOEF4MlF7LeO7uq-uThJSulJlTh--wgLeaVibsbb3tc/edit#slide=id.g5499b9c42_094)
+- redundant store elimination
+- control flow elimination
+  - turns branch chains into switches
+- allocation folding and write barrier elimination
 
 ## CodeStubAssembler
 
 [watch](https://youtu.be/M1FBosB5tjM?t=23m38s) |
 [read](https://v8project.blogspot.com/2017/11/csa.html) |
-[slides](https://docs.google.com/presentation/d/1u6bsgRBqyVY3RddMfF1ZaJ1hWmqHZiVMuPRw_iKpHlY/edit#slide=id.g17a3a2e7fd_0_114)
+[slides](https://docs.google.com/presentation/d/1u6bsgRBqyVY3RddMfF1ZaJ1hWmqHZiVMuPRw_iKpHlY/edit#slide=id.g17a3a2e7fd_0_114) |
+[slides](https://docs.google.com/presentation/d/1u6bsgRBqyVY3RddMfF1ZaJ1hWmqHZiVMuPRw_iKpHlY/edit#slide=id.p)
 
 ### What is the CodeStubAssember aka CSA?
 
@@ -467,6 +507,8 @@ to the following characteristics.
 
 #### Improvements via CodeStubAssembler
 
+[slide](https://docs.google.com/presentation/d/1H1lLsbclvzyOF3IUR05ZUaZcqDxo7_-8f4yJoxdMooU/edit#slide=id.g18ceb14721_0_50)
+
 CSA is the basis for fast builtins and thus was used to speed up multiple builtins. Below are a
 few examples.
 
@@ -479,7 +521,9 @@ few examples.
 
 ## Facit
 
-[watch](https://youtu.be/M1FBosB5tjM?t=52m54s) | [watch](https://youtu.be/HDuSEbLWyOY?t=10m36s)
+[watch](https://youtu.be/M1FBosB5tjM?t=52m54s) |
+[watch](https://youtu.be/HDuSEbLWyOY?t=10m36s) |
+[slide](https://docs.google.com/presentation/d/1_eLlVzcj94_G4r9j9d_Lj5HRKFnq6jgpuPJtnmIBs88/edit#slide=id.g2134da681e_0_577)
 
 - performance of your code is improved
 - less _anti patterns_ aka _you are holding it wrong_
@@ -504,8 +548,16 @@ few examples.
 ### Slides
 
 - [CodeStubAssembler: Redux - 2016](https://docs.google.com/presentation/d/1u6bsgRBqyVY3RddMfF1ZaJ1hWmqHZiVMuPRw_iKpHlY/edit#slide=id.p)
+- [Deoptimization in V8 - 2016](https://docs.google.com/presentation/d/1Z6oCocRASCfTqGq1GCo1jbULDGS-w-nzxkbVF7Up0u0/edit#slide=id.p)
+- [Turbofan IR - 2016](https://docs.google.com/presentation/d/1Z9iIHojKDrXvZ27gRX51UxHD-bKf1QcPzSijntpMJBM/edit#slide=id.p)
+- [TurboFan: A new code generation architecture for V8 - 2017](https://docs.google.com/presentation/d/1_eLlVzcj94_G4r9j9d_Lj5HRKFnq6jgpuPJtnmIBs88/edit#slide=id.p)
+- [Fast arithmetic for dynamic languages - 2016](https://docs.google.com/presentation/d/1wZVIqJMODGFYggueQySdiA3tUYuHNMcyp_PndgXsO1Y/edit#slide=id.p)
+- [An overview of the TurboFan compiler - 2016](https://docs.google.com/presentation/d/1H1lLsbclvzyOF3IUR05ZUaZcqDxo7_-8f4yJoxdMooU/edit#slide=id.p)
+- [TurboFan JIT Design - 2016](https://docs.google.com/presentation/d/1sOEF4MlF7LeO7uq-uThJSulJlTh--wgLeaVibsbb3tc/edit#slide=id.p)
+- [CodeStubAssembler: Redux](https://docs.google.com/presentation/d/1u6bsgRBqyVY3RddMfF1ZaJ1hWmqHZiVMuPRw_iKpHlY/edit#slide=id.p)
 
 ### Videos
 
 - [performance improvements in latest v8 - 2017](https://youtu.be/HDuSEbLWyOY?t=4m58s)
 - [v8 and how it listens to you - ICs and FeedbackVectors - 2017](https://www.youtube.com/watch?v=u7zRSm8jzvA)
+- [Escape Analysis in V8 - 2018](https://www.youtube.com/watch?v=KiWEWLwQ3oI)
