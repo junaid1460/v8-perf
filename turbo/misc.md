@@ -33,12 +33,21 @@ NOTE: most likely superceded by [custom startup snapshots](#custom-startup-snaps
 - serializer cannot _directly_ capture state outside of v8, thus outside state needs to be
   attached to a JavaScript object via _embedder fields_
 
-TODO: notes from more up to date post
+### Lazy Deserialization
+
+[read](https://v8project.blogspot.com/2018/02/lazy-deserialization.html)
+
+- only about 30% of builtin functions are used on average
+- deserialize builtin function from the snapshot when it is called the first time
+- functions have _well-known_ positions within the snapshot's dedicated builtins area
+- starting offset of each code boject is kept in a dedicated section within builtins area
+- additionally implemented lazy deserializations for bytecode handlers, which contain logic to
+  execute each bytecode within Ignition interpreter
+- enabled in v8 v6.4 resulting in average v8's heap size savings of 540 KB
 
 ### Resources
 
-- [custom startup snapshots](https://v8project.blogspot.com/2015/09/custom-startup-snapshots.html)
-  slightly out of date as embedder API changed and lazy deserialization was introduced
-- [Energizing Atom with V8's custom start-up snapshot](https://v8project.blogspot.com/2017/05/energizing-atom-with-v8s-custom-start.html)
-- [lazy deserialization](https://v8project.blogspot.com/2018/02/lazy-deserialization.html)
-
+- [custom startup snapshots - 2015](https://v8project.blogspot.com/2015/09/custom-startup-snapshots.html)
+  somewhat out of date as embedder API changed and lazy deserialization was introduced
+- [Energizing Atom with V8's custom start-up snapshot - 2017](https://v8project.blogspot.com/2017/05/energizing-atom-with-v8s-custom-start.html)
+- [Lazy deserialization - 2018](https://v8project.blogspot.com/2018/02/lazy-deserialization.html)
