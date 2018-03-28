@@ -437,12 +437,14 @@ function usePoint(point) {
 
 [watch](https://youtu.be/KiWEWLwQ3oI?t=34s) |
 [slides](https://docs.google.com/presentation/d/1sOEF4MlF7LeO7uq-uThJSulJlTh--wgLeaVibsbb3tc/edit#slide=id.g5499b9c42_074) |
-[slides](https://docs.google.com/presentation/d/1sOEF4MlF7LeO7uq-uThJSulJlTh--wgLeaVibsbb3tc/edit#slide=id.g5499b9c42_0105)
+[slides](https://docs.google.com/presentation/d/1sOEF4MlF7LeO7uq-uThJSulJlTh--wgLeaVibsbb3tc/edit#slide=id.g5499b9c42_0105) |
+[read](http://darksi.de/d.sea-of-nodes/)
 
-- doesn't include total order of program, but dependencies between operations
+- doesn't include total order of program, but _control dependencies_ between operations
 - instead expresses many possible legal orderings of code
 - most efficient ordering and placement can be derived from the _nodes_
   - depends on control dominance, loop nesting, register pressure
+- _graph reductions_ applied to further optimize 
 - total ordering (traditional CFG) is built from that, so code can be generated and registers
   allocated
 - entrypoints are TurboFan optimizing compiler and WASM Compiler
@@ -467,6 +469,9 @@ Flexibility of sea of nodes approach enables the below optimizations.
 - control flow elimination
   - turns branch chains into switches
 - allocation folding and write barrier elimination
+- verify var is only assigned once (SSA - single static assignment) 
+    - compiler may move the assignment anywhere, i.e. outside a loop
+    - may remove redundant checks
 
 ## CodeStubAssembler
 
@@ -544,6 +549,7 @@ few examples.
 - [lazy unlinking of deoptimized functions - 2017](https://v8project.blogspot.com/2017/10/lazy-unlinking.html)
 - [Taming architecture complexity in V8 — the CodeStubAssembler - 2017](https://v8project.blogspot.com/2017/11/csa.html)
 - [V8 release v6.5 - 2018](https://v8project.blogspot.com/2018/02/v8-release-65.html)
+- [Sea of Nodes - 2015](http://darksi.de/d.sea-of-nodes/)
 
 ### Slides
 
