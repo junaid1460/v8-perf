@@ -361,6 +361,17 @@ jo Deoptimize                   ; if overflowed bail
 - for performance reasons unlinking of code object is postponed until next invocation of the
   function in question
 
+### Deoptimization Loop
+
+[read](https://v8project.blogspot.com/2018/02/v8-release-65.html)
+
+- occured when optimized code deoptimized and there was _no way to learn what went wrong_
+- one cause was altering the shape of the array in the callback function of a second order
+  array builtin, i.e. by changing it's length
+- TurboFan kept trying to optimized and gave up after ~30 attempts
+- starting with v8 v6.5 this is detected and array built in is no longer inlined at that site
+  on future optimization attempts
+
 ### Deoptimization Reasons
 
 ### Class Definitions inside Functions
@@ -488,6 +499,7 @@ few examples.
 - [Launching Ignition and TurboFan - 2017](https://v8project.blogspot.com/2017/05/launching-ignition-and-turbofan.html)
 - [lazy unlinking of deoptimized functions - 2017](https://v8project.blogspot.com/2017/10/lazy-unlinking.html)
 - [Taming architecture complexity in V8 — the CodeStubAssembler - 2017](https://v8project.blogspot.com/2017/11/csa.html)
+- [V8 release v6.5 - 2018](https://v8project.blogspot.com/2018/02/v8-release-65.html)
 
 ### Slides
 
