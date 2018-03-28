@@ -14,20 +14,34 @@
 - entirely new approach to how _bound function exotic objects_ are implemented
 - crossing C++/JS boundaries no longer needed
 - pushing bound receiver and bound arguments directly and then calling target function allows
-  futher compile time optimizations and enables inlining the target function into the
+  further compile time optimizations and enables inlining the target function into the
   caller
+- TurboFan inlines all mononomorphic calls to `bind` itself
 - resulted in **~400x** speed improvement
+- the performance of the React runtime,  which makes heavy use of `bind`, doubled as a result
 
 ### Facit
 
 - developers should use bound functions freely wherever they apply without having to worry
   about performance penalties
+- the two below snippets perform same but arguable the second one is more readable and for the
+  case of `arr.reduce` is the only wat to pass `this` as it doesn't support passing it as a
+  separate parameter like `forEach` and `map` do
+
+```js
+// passing `this` to map as separate parameter
+arr.map(convert, this)
+
+// binding `this` to the convert function directly
+arr.map(convert.bind(this))
+```
 
 ### Resources
 
 - [A new approach to Function.prototype.bind - 2015](http://benediktmeurer.de/2015/12/25/a-new-approach-to-function-prototype-bind/)
 - [Optimizing bound functions further - 2016](http://benediktmeurer.de/2016/01/14/optimizing-bound-functions-further/)
 - [bound function exotic objects](https://tc39.github.io/ecma262/#sec-bound-function-exotic-objects)
+- [V8 release v6.4 - 2017](https://v8project.blogspot.com/2017/12/v8-release-64.html)
 
 ## instanceof and @@hasInstance
 
@@ -68,12 +82,16 @@
 
 ## Array Builtins
 
-- `Array` builtins like `map` and `forEach` can be inlined into TurboFan optimized code which
-  results in considerable performance improvement
-- optimizations are applied to all _major non-holey_ elements kinds
+- `Array` builtins like `map`, `forEach`, `reduce`, `reduceRight`, `find`, `findIndex`, `some`
+  and `every` can be inlined into TurboFan optimized code which results in considerable
+  performance improvement
+- optimizations are applied to all _major non-holey_ elements kinds for all `Array` builtins
+- for all builtins, except `find` and `findIndex` _holey floating-point_ arrays don't cause
+  bailouts anymore
 
 - [V8: Behind the Scenes (February Edition) - 2017](http://benediktmeurer.de/2017/03/01/v8-behind-the-scenes-february-edition/)
 - [V8 Release 6.1 - 2017](https://v8project.blogspot.com/2017/08/v8-release-61.html)
+- [V8 release v6.5 - 2018](https://v8project.blogspot.com/2018/02/v8-release-65.html)
 
 ## const
 
@@ -301,10 +319,15 @@ const FooBar = createClassBasedOn(Bar)
 - entry-point stub into RegExp engine can easily be called from CodeStubAssembler
 - make sure to neither modify the `RegExp` instance or its prototype as that will interfere
   with optimizations applied to regex operations
+- [named capture groups](https://developers.google.com/web/updates/2017/07/upcoming-regexp-features#named_captures)
+  are supported starting with v8 v6.4
 
 ### Resources
 
 - [Speeding up V8 Regular Expressions - 2017](https://v8project.blogspot.com/2017/01/speeding-up-v8-regular-expressions.html)
+- [V8 release v6.4 - 2017](https://v8project.blogspot.com/2017/12/v8-release-64.html)
+- [RegExp named capture groups - 2017](http://2ality.com/2017/05/regexp-named-capture-groups.html#named-capture-groups)
+
 
 ## Destructuring
 
