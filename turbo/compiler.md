@@ -62,7 +62,8 @@ Once crankshaft was taken out of the mix the below pipeline was possible
 - bytecode is 25-50% the size of equivalent baseline machine code
 - combines cutting-edge IR (intermediate representation) with multi-layered translation +
   optimization pipeline
-- relaxed [sea of nodes]() (IR) allows more effective reordering and optimization
+- relaxed [sea of nodes](#sea-of-nodes) approach allows more effective reordering and optimization when generating
+  CFG
 - to achieve that fluid code motion, control flow optimizations and precise numerical range
   analysis are used
 - clearer separation between JavaScript, v8 and the target architectures allows cleaner, more
@@ -176,7 +177,7 @@ Once crankshaft was taken out of the mix the below pipeline was possible
 
 ## Collecting Feedback via ICs
 
-[watch hidden classes/maps](https://youtu.be/u7zRSm8jzvA?t=6m12s) | [watch](https://youtu.be/u7zRSm8jzvA?t=8m20s) | [watch feedback workflow]((https://youtu.be/u7zRSm8jzvA?t=14m58s))
+[watch hidden classes/maps](https://youtu.be/u7zRSm8jzvA?t=6m12s) | [watch](https://youtu.be/u7zRSm8jzvA?t=8m20s) | [watch feedback workflow](https://youtu.be/u7zRSm8jzvA?t=14m58s)
 
 - main concept is the same as with old compiler chain, therefore [find more information here](https://github.com/thlorenz/v8-perf/blob/master/compiler.md#inline-caches)
 - changes to how/what data is collected
@@ -269,7 +270,7 @@ TurboFan is not just an optimizing compiler:
 - generates optimized code just for those cases which is not only smaller but also executes at
   peak speed
 
-### Add Example of Ignition and Feedback Vector
+### `add` Example of Ignition and Feedback Vector
 
 ```
    Bytecode                Interpreter State             Machine Stack
@@ -435,7 +436,6 @@ function usePoint(point) {
 
 ## Sea Of Nodes
 
-[watch](https://youtu.be/KiWEWLwQ3oI?t=34s) |
 [slides](https://docs.google.com/presentation/d/1sOEF4MlF7LeO7uq-uThJSulJlTh--wgLeaVibsbb3tc/edit#slide=id.g5499b9c42_074) |
 [slides](https://docs.google.com/presentation/d/1sOEF4MlF7LeO7uq-uThJSulJlTh--wgLeaVibsbb3tc/edit#slide=id.g5499b9c42_0105) |
 [read](http://darksi.de/d.sea-of-nodes/)
@@ -458,7 +458,7 @@ Flexibility of sea of nodes approach enables the below optimizations.
 - better redundant code elimination due to more code motion
 - loop peeling
 - load/check elimination
-- escape analysis [watch](https://youtu.be/KiWEWLwQ3oI?t=7m13s)
+- escape analysis [watch](https://youtu.be/KiWEWLwQ3oI?t=7m25s) | [watch](https://youtu.be/KiWEWLwQ3oI?t=17m25s)
   - eliminates non-escaping allocations
   - aggregates like `const o = { foo: 1, bar: 2}` are replaces with scalars like
     `const o_foo = 1; const o_bar = 2`
@@ -560,7 +560,6 @@ few examples.
 - [Fast arithmetic for dynamic languages - 2016](https://docs.google.com/presentation/d/1wZVIqJMODGFYggueQySdiA3tUYuHNMcyp_PndgXsO1Y/edit#slide=id.p)
 - [An overview of the TurboFan compiler - 2016](https://docs.google.com/presentation/d/1H1lLsbclvzyOF3IUR05ZUaZcqDxo7_-8f4yJoxdMooU/edit#slide=id.p)
 - [TurboFan JIT Design - 2016](https://docs.google.com/presentation/d/1sOEF4MlF7LeO7uq-uThJSulJlTh--wgLeaVibsbb3tc/edit#slide=id.p)
-- [CodeStubAssembler: Redux](https://docs.google.com/presentation/d/1u6bsgRBqyVY3RddMfF1ZaJ1hWmqHZiVMuPRw_iKpHlY/edit#slide=id.p)
 
 ### Videos
 
