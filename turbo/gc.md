@@ -2,8 +2,10 @@
 
 ## Orinoco Garbage Collector
 
-[watch orinoco overview]([watch](https://youtu.be/EdFDJANJJLs?t=15m10s)) | [jank and concurrent GC](https://youtu.be/HDuSEbLWyOY?t=5m14s)
+[watch orinoco overview]([watch](https://youtu.be/EdFDJANJJLs?t=15m10s)) | [jank and concurrent GC](https://youtu.be/HDuSEbLWyOY?t=5m14s) |
+[read](https://v8project.blogspot.com/2016/04/jank-busters-part-two-orinoco.html)
 
+- mostly parallel and concurrent garbage collector without _strict_ generational boundaries
 - most parts of GC taken off the main thread (56% less GC on main thread)
 - optimized weak global handles
 - unified heap for full garbage collection
@@ -11,11 +13,29 @@
 - reduced peak memory consumption of on-heap peak memory by up to 40% and off-heap peak memory
   by 20% for low-memory devices by tuning several GC heuristics
 
+### Memory Partition and Parallelization
+
+- heap memory is partitioned into fixed-size chunks, called _pages_
+- _young generation evacuation_ is archieved in parallel by copying memory based on pages
+- _memory compaction_ parallelized on page-level
+- young generation and old generation compaction phases don't depend on each other and thus are
+  parallelized
+- resulted in 75% reduction of compaction time
+
+### Tracking Pointers
+
+[read](https://v8project.blogspot.com/2016/04/jank-busters-part-two-orinoco.html)
+
+### Black Allocation
+
+[read](https://v8project.blogspot.com/2016/04/jank-busters-part-two-orinoco.html)
+
 ### Generational Garbage Collector
 
-- objects initially allocated in _nursery_ of the _young generation_
-- objects surviving one GC are copied into _intermediate_ space of the _young generation_
-- objects surviving two GCs are moved into _old generation_
+- young generation evacuation
+  - objects initially allocated in _nursery_ of the _young generation_
+  - objects surviving one GC are copied into _intermediate_ space of the _young generation_
+  - objects surviving two GCs are moved into _old generation_
 
 ```
         young generation         |   old generation
@@ -91,7 +111,10 @@ _Distribution of scavenger work across one main thread and two worker threads_
 
 ### Old Generation
 
-TODO
+### Operations Running Concurrently
+
+- sweeping of code and map space of v8 heap
+- unmapping of unused pages
 
 ## Memory Inspection and HeapSnapshots
 
