@@ -1,7 +1,5 @@
 ## Code Caching
 
-NOTE: most likely superceded by [custom startup snapshots](#custom-startup-snapshots)
-
 - lessens overhead of parsing + compiling script
 - uses cached data to recreate previous compilation result
 - exposed via v8's API to embedders
@@ -12,10 +10,23 @@ NOTE: most likely superceded by [custom startup snapshots](#custom-startup-snaps
   - later cache data can be attached to the source object and passed
     `v8::ScriptCompiler::kConsumeCodeCache` as an option to cause v8 to bypass compileing the
     code and deserialize the provided cache data instead
+- v8 6.6 caches top level code as well as code generated _after_ script's top-level execution,
+  which means that lazily compiled functions are included in the cache
+
+### Chrome's Use of Code Caching
+
+Since Chrome embeds v8 it can make use of Code Caching and does so as follows.
+
+- cold load: page loaded for the first time and thus no cached data is available
+- warm load: page loaded before and caches compiled code along with the script file in disk
+  cache
+- hot load: page loaded twice before and thus can use the cached compiled code instead of
+  parsing + compiling the script again
 
 ### Resources
 
-- [Code caching](https://v8project.blogspot.com/2015/07/code-caching.html)
+- [Code caching - 2015](https://v8project.blogspot.com/2015/07/code-caching.html)
+- [Code caching after execution - 2018](https://v8project.blogspot.com/2018/03/v8-release-66.html)
 
 ## Startup Snapshots
 
@@ -23,7 +34,7 @@ NOTE: most likely superceded by [custom startup snapshots](#custom-startup-snaps
 
 - v8 uses snapshots and lazy deserialization to _retrieve_ previously optimized code for builtin
   functions
-- powerful snapshot API exposed to embedders via `v8::SnapshotCreator` 
+- powerful snapshot API exposed to embedders via `v8::SnapshotCreator`
 - among other things this API allows embedders to provide an additional script to customize a
   start-up snapshot
 - new contexts created from the snapshot are initialized in a state obtained _after_ the script
