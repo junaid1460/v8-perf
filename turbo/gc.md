@@ -1,4 +1,4 @@
-# v8 Garbage Collector
+# v8 Memory Management
 
 ## Orinoco Garbage Collector
 
@@ -13,25 +13,10 @@
 - reduced peak memory consumption of on-heap peak memory by up to 40% and off-heap peak memory
   by 20% for low-memory devices by tuning several GC heuristics
 
-### Memory Partition and Parallelization
-
-- heap memory is partitioned into fixed-size chunks, called _pages_
-- _young generation evacuation_ is archieved in parallel by copying memory based on pages
-- _memory compaction_ parallelized on page-level
-- young generation and old generation compaction phases don't depend on each other and thus are
-  parallelized
-- resulted in 75% reduction of compaction time
-
-### Tracking Pointers
-
-[read](https://v8project.blogspot.com/2016/04/jank-busters-part-two-orinoco.html)
-
-### Black Allocation
-
-[read](https://v8project.blogspot.com/2016/04/jank-busters-part-two-orinoco.html)
-
 ### Generational Garbage Collector
 
+- two garbage collectors are implemented, each focusing on _young_ and _old_ generation
+  respectively
 - young generation evacuation
   - objects initially allocated in _nursery_ of the _young generation_
   - objects surviving one GC are copied into _intermediate_ space of the _young generation_
@@ -48,17 +33,13 @@
               |                  |
 ```
 
-- two garbage collectors are implemented, each focusing on _young_ and _old_ generation
-  respectively
-- older v8 versions used Cheney semispace copying garbage collector that divides young
-  generation in two equal halves, read more about it [here](../gc.md#tospace-fromspace-memory-exhaustion) TODO fix link once repo rearranged
-- starting with v8 6.2 a parallel scavenger is used to collect the young generation
-
 ### Parallel Scavenger
 
 [read](https://v8project.blogspot.com/2017/11/orinoco-parallel-scavenger.html)
 
-- introduced end of 2017 with v8 v6.2 which is part of Node.js v8
+- introduced with v8 v6.2 which is part of Node.js v8
+- older v8 versions used Cheney semispace copying garbage collector that divides young
+  generation in two equal halves, read more about it [here](../gc.md#tospace-fromspace-memory-exhaustion) TODO fix link once repo rearranged
 - single threaded scavenger made sense on single-core environments, but at this point Chrome,
   Node.js and thus v8 runs in many multicore scenarios
 - new algorithm similar to the [Halstead semispace copying collector](https://www.cs.cmu.edu/~guyb/papers/gc2001.pdf)
@@ -70,20 +51,16 @@ As with the previous algorithm scavenge happens in four phases.
 All phases are performed in parallel and interleaved on each task, thus maximizing utilization
 of worker tasks.
 
-1. scanning for roots
-
-- majority of root set are the references from the old generation to the young generation
-- remembered sets are maintained per page (TODO more details in other articles) and thus
-  naturally distributes the root sets among garbage collection threads
-
-2. copying objects within the young generation
-3. promoting objects to the old generation
-
-- objects are processed in parallel
-- newly found objects are added to a global work list from which garbage collection threads can
-  _steal_
-
-4. updating pointers
+1. scan for roots
+    - majority of root set are the references from the old generation to the young generation
+    - [remembered sets](#tracking-pointers) are maintained per page and thus naturally distributes
+      the root sets among garbage collection threads
+2. copy objects within the young generation
+3. promote objects to the old generation
+    - objects are processed in parallel
+    - newly found objects are added to a global work list from which garbage collection threads can
+      _steal_
+4. update pointers
 
 ![parallel scavenger](https://1.bp.blogspot.com/-fqUIuq6zXEg/Wh2T1lAM5nI/AAAAAAAAA8M/g183HuHqOis6kENwJGt9ctloHEaXEQlagCLcBGAs/s1600/image4.png)
 ![threads](https://3.bp.blogspot.com/-IQcY0MHevKs/Wh2T08XW7wI/AAAAAAAAA8I/EluBNmwT2XIPZNkznSRUml6AmOJWZiJwQCLcBGAs/s1600/image3.png)
@@ -95,6 +72,39 @@ _Distribution of scavenger work across one main thread and two worker threads_
 - just a little slower than the optimized Cheney algorithm on very small heaps
 - provides high throughput when heap gets larger with lots of life objects
 - time spent on main thread by the scavenger was reduced by 20%-50%
+
+### Techniques to Improve GC Performance
+
+#### Memory Partition and Parallelization
+
+- heap memory is partitioned into fixed-size chunks, called _pages_
+- _young generation evacuation_ is archieved in parallel by copying memory based on pages
+- _memory compaction_ parallelized on page-level
+- young generation and old generation compaction phases don't depend on each other and thus are
+  parallelized
+- resulted in 75% reduction of compaction time
+
+#### Tracking Pointers
+
+[read](https://v8project.blogspot.com/2016/04/jank-busters-part-two-orinoco.html)
+
+- GC tracks pointers to objects which have to be updated whenever an object is moved
+- all pointers to old location need to be updated to object's new location
+- v8 uses a _rembered set_ of _interesting pointers_ on the heap
+- an object is _interesting_ if it may move during garbage collection or if it lives in heavily
+  fragmented pages and thus will be moved during compaction
+- _remembered sets_ are organized to simplify parallelization and ensure that threads get
+  disjoint sets of pointers to update
+- each page stores offsets to _interesting_ pointers originating from that page
+
+#### Black Allocation
+
+[read](https://v8project.blogspot.com/2016/04/jank-busters-part-two-orinoco.html)
+
+- assumption: objects recently allocated in the old generation should at least survive the next
+  old generation garbage collection and thus are _colored_ black
+- _black objects_ are allocated on black pages which aren't swept
+- speeds up incremental marking process and results in less garbage collection
 
 ### Resources
 
@@ -108,13 +118,6 @@ _Distribution of scavenger work across one main thread and two worker threads_
 - [V8 Release 5.4](https://v8project.blogspot.com/2016/09/v8-release-54.html)
 - [Optimizing V8 memory consumption](https://v8project.blogspot.com/2016/10/fall-cleaning-optimizing-v8-memory.html)
 - [Orinoco: young generation garbage collection](https://v8project.blogspot.com/2017/11/orinoco-parallel-scavenger.html)
-
-### Old Generation
-
-### Operations Running Concurrently
-
-- sweeping of code and map space of v8 heap
-- unmapping of unused pages
 
 ## Memory Inspection and HeapSnapshots
 
