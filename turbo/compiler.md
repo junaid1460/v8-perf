@@ -434,6 +434,16 @@ function usePoint(point) {
 
 - smart heuristics, i.e. how many times was the function called so far
 
+## Background Compilation
+
+[read](https://v8project.blogspot.com/2018/03/background-compilation.html)
+
+- part of the compilation pipeline that doesn't acess objects on the JavaScript heap run on a
+  background thread
+- via some optimization to the bytecode compiler and how AST is stored and accessed, almost all
+  of the compilation of a script happens on a background thread
+- only short AST internalizatoin and bytecode finalization happens on main thread
+
 ## Sea Of Nodes
 
 [slides](https://docs.google.com/presentation/d/1sOEF4MlF7LeO7uq-uThJSulJlTh--wgLeaVibsbb3tc/edit#slide=id.g5499b9c42_074) |
@@ -549,6 +559,7 @@ few examples.
 - [lazy unlinking of deoptimized functions - 2017](https://v8project.blogspot.com/2017/10/lazy-unlinking.html)
 - [Taming architecture complexity in V8 — the CodeStubAssembler - 2017](https://v8project.blogspot.com/2017/11/csa.html)
 - [V8 release v6.5 - 2018](https://v8project.blogspot.com/2018/02/v8-release-65.html)
+- [Background compilation - 2018](https://v8project.blogspot.com/2018/03/background-compilation.html)
 - [Sea of Nodes - 2015](http://darksi.de/d.sea-of-nodes/)
 
 ### Slides
