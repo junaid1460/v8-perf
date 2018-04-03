@@ -454,7 +454,7 @@ function usePoint(point) {
 - instead expresses many possible legal orderings of code
 - most efficient ordering and placement can be derived from the _nodes_
   - depends on control dominance, loop nesting, register pressure
-- _graph reductions_ applied to further optimize 
+- _graph reductions_ applied to further optimize
 - total ordering (traditional CFG) is built from that, so code can be generated and registers
   allocated
 - entrypoints are TurboFan optimizing compiler and WASM Compiler
@@ -479,7 +479,7 @@ Flexibility of sea of nodes approach enables the below optimizations.
 - control flow elimination
   - turns branch chains into switches
 - allocation folding and write barrier elimination
-- verify var is only assigned once (SSA - single static assignment) 
+- verify var is only assigned once (SSA - single static assignment)
     - compiler may move the assignment anywhere, i.e. outside a loop
     - may remove redundant checks
 
@@ -549,6 +549,39 @@ few examples.
 	- Maps, Sets, WeakMaps, WeakSets used where it makes sense results in easier maintainable JavaScript as they offer specific functionality to iterate over and inspect their values
 - avoid engine specific workarounds aka _CrankshaftScript_, instead file a bug report if you discover a bottleneck
 
+### Considerations when Improving Performance
+
+Three groups of optimizations are algorithmic improvements, workarounds JavaScript limitations
+and workarounds for v8 related issues.
+
+As we have shown v8 related issues have decreased immensly and should be reported to the v8
+team if found, however in some cases workarounds are needed.
+
+However before applying any optimizations first profile your app and understand the underlying
+problem, then apply changes and prove by measuring that they change things for the better.
+
+#### Profilers
+
+- different performance problems call for different approaches to profile and visualize the
+  the cause
+- learn to use different profilers including _low level_ profilers like `perf`
+- you can start learning about different approaches via the [v8 inspection](#inspection.md) and [node.js perf
+  tooling](node.js.md) documents
+
+#### Tweaking hot Code
+
+- before applying micro optimizations to your code reason about its abstract complexity
+- evaluate how your code would be used on average and in the worst case and make sure your
+  algorithm handles both cases in a performant manner
+- prefer monomorphism in very hot code paths if possible, as polymorphic functions cannot be
+  optimized to the extent that monomorphic ones can
+- measure that strategies like _caching_ and _memoization_ actually result in performance
+  improvements before applying them as in some cases the cache lookup maybe more expensive than
+  performing the computation
+- understand limitations and costs of v8, a garbage collected system, in order to choose
+  appropriate data types to improve performance, i.e. prefer a `Uint8Array` over a `String`
+  when it makes sense
+
 ## Resources
 
 - [V8: Behind the Scenes (November Edition) - 2016](http://benediktmeurer.de/2016/11/25/v8-behind-the-scenes-november-edition/)
@@ -560,6 +593,7 @@ few examples.
 - [Taming architecture complexity in V8 — the CodeStubAssembler - 2017](https://v8project.blogspot.com/2017/11/csa.html)
 - [V8 release v6.5 - 2018](https://v8project.blogspot.com/2018/02/v8-release-65.html)
 - [Background compilation - 2018](https://v8project.blogspot.com/2018/03/background-compilation.html)
+- [Maybe you don't need Rust and WASM to speed up your JS - 2018](https://mrale.ph/blog/2018/02/03/maybe-you-dont-need-rust-to-speed-up-your-js.html)
 - [Sea of Nodes - 2015](http://darksi.de/d.sea-of-nodes/)
 
 ### Slides
