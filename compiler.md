@@ -1,5 +1,8 @@
 # Ignition and TurboFan Compiler Pipeline
 
+_find the previous version of this document at
+[crankshaft/compiler.md](crankshaft/compiler.md)_
+
 Fully activated with v8 version 5.9. Earliest LTS Node.js release with a TurboFan activated
 pipleline is Node.js v8.
 
@@ -179,24 +182,32 @@ Once crankshaft was taken out of the mix the below pipeline was possible
 
 [watch hidden classes/maps](https://youtu.be/u7zRSm8jzvA?t=6m12s) | [watch](https://youtu.be/u7zRSm8jzvA?t=8m20s) | [watch feedback workflow](https://youtu.be/u7zRSm8jzvA?t=14m58s)
 
-- main concept is the same as with old compiler chain, therefore [find more information here](https://github.com/thlorenz/v8-perf/blob/master/compiler.md#inline-caches)
-- changes to how/what data is collected
-  - data-driven approach
-  - uses _FeedbackVector_ attached to every function, responsible to record and manage all
-    execution feedback to later speed up its execution
-  - _FeedbackVector_ linked from function closure and contains slots to store different kinds
-    of feedback
+[Inline Caches implemented in JavaScript](http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html)
+
+- gather knowledge about types while program runs
+- feedback collected via data-driven approach
+- uses _FeedbackVector_ attached to every function, responsible to record and manage all
+  execution feedback to later speed up its execution
+- _FeedbackVector_ linked from function closure and contains slots to store different kinds
+  of feedback
 - we can inspect what's inside the _FeedbackVector_ of a function in a debug build of d8 by
   passing the `--allow-natives-syntax` flag and calling `%DebugPrint(fn)`
-- polymorphic: 2-4 different types seen
 - if monomorphic compare maps and if they match just load prop at offset in memory, i.e. `mov eax, [eax+0xb]`
 - IC feedback slots reserved when AST is created, see them via `--print-ast`, i.e. `Slot(0) at 29`
-- collect typeinfo for ~24% of the ICs before attempting optimization
-- see optimization + IC info via `--trace-opt`
-	-  _generic ICs_ are _bad_ as if lots of them are present, code will not be optimized
-	- _ICs with typeinfo_ are _good_
+- collect typeinfo for ~24% of the function's ICs before attempting optimization
 - feedback vectors aren't embedded in optimized code but map ids or specific type checks, like for SMIs
-- evaluate ICs via  `--trace-ic test.js && ./v8/tools/ic-processor`
+- see optimization + IC info via [`--trace-opt`](inspection.md#tracing-optimizations)
+- evaluate ICs via the  [`--trace-ic` flag](inspection.md#tracing-inline-caches)
+
+### Monomorphism vs. Polymorphism
+
+[watch](http://youtu.be/UJPdhx5zTaw?t=31m30s) | [slide](http://v8-io12.appspot.com/index.html#61)
+
+- operations are monomorphic if hidden classes of arguments are **always** same
+- all others are polymorphic at best and megamorphic at worst
+- polymorphic: 2-4 different types seen
+- monomorphic operations are easier optimized
+
 
 ### Feedback Lattice
 
@@ -265,7 +276,9 @@ TurboFan is not just an optimizing compiler:
 
 ## Speculative Optimization
 
-- main concept is the same as with old compiler chain, therefore [read this for more info](https://github.com/thlorenz/v8-perf/blob/master/compiler.md#optimizing-compiler-1)
+[watch](http://youtu.be/VhpdsjBUS3g?t=18m53s)
+
+- recompiles and optimizes hot code identified by the runtime profiler
 - compiler speculates that kinds of values seen in the past will be see in the future as well
 - generates optimized code just for those cases which is not only smaller but also executes at
   peak speed
@@ -317,19 +330,35 @@ Return        ; end execution, return value in accum. reg. and tranfer control t
 ## Deoptimization
 
 [slides](https://docs.google.com/presentation/d/1Z6oCocRASCfTqGq1GCo1jbULDGS-w-nzxkbVF7Up0u0/edit#slide=id.p) |
-[slides](https://docs.google.com/presentation/d/1wZVIqJMODGFYggueQySdiA3tUYuHNMcyp_PndgXsO1Y/edit#slide=id.g19ee040be6_0_180)
+[slides](https://docs.google.com/presentation/d/1wZVIqJMODGFYggueQySdiA3tUYuHNMcyp_PndgXsO1Y/edit#slide=id.g19ee040be6_0_180) |
+[watch](http://youtu.be/UJPdhx5zTaw?t=36m50s)
+
+- optimizations are speculative and assumptions are made
+- if assumption is violated
+  - function deoptimized
+  - execution resumes in Ignition bytecode
+  - in short term execution slows down
+  - normal to occur
+  - more info about about function collected
+  - _better_ optimization attempted
+  - if assumptions are violated again, deoptimized again and start over
+- too many deoptimizations cause function to be sent to *deoptimization hell*
+  - considered not optimizable and no optimization is **ever** attempted again
+- assumtions are verified as follows:
+  - _code objects_ are verified via a `test` in the _prologue_ of the generated machine code for a
+    particular function
+  - argument types are verified before entering the function body
 
 ### Bailout
 
 [watch bailout example](https://youtu.be/u7zRSm8jzvA?t=26m43s) | [watch walk through TurboFan optimized code with bailouts](https://youtu.be/u7zRSm8jzvA?t=19m36s)
 
 - when assumptions made by optimizing compiler don't hold it bails out to deoptimized code
-- _code objects_ are verified via a `test` in the _prologue_ of the generated machine code for a
-  particular function
-- argument types are verified before entering the function body
 - on bail out the code object is _thrown_ away as it doesn't handle the current case
 - _trampoline_ to unoptimized code (stored in SharedFunctionInfo) used to _jump_ and continue
   execution
+
+#### Example of x86 Assembly Code including Checks and Bailouts
 
 ```asm
 ; x64 machine code generated by TurboFan for the Add Example above
@@ -383,9 +412,45 @@ jo Deoptimize                   ; if overflowed bail
 - starting with v8 v6.5 this is detected and array built in is no longer inlined at that site
   on future optimization attempts
 
-### Deoptimization Reasons
+### Causes for Deoptimization
 
-### Class Definitions inside Functions
+#### Modifying Object Shape
+
+[watch](http://youtu.be/VhpdsjBUS3g?t=21m00s)
+
+- added fields (order matters) to object generate id of hidden class
+- adding more fields later on generates new class id which results in code using Point that now gets Point' to be
+  deoptimized
+
+[watch](http://youtu.be/VhpdsjBUS3g?t=21m45s)
+[watch](http://youtu.be/UJPdhx5zTaw?t=12m18s)
+
+```js
+function Point(x, y) {
+  this.x = x;
+  this.y = y;
+}
+
+var p = new Point(1, 2); // => hidden Point class created
+
+// ....
+
+p.z = 3;                 // => another hidden class (Point') created
+```
+
+- `Point` class created, code still deoptimized
+- functions that have `Point` argument are optimized
+- `z` property added which causes `Point'` class to be created
+- functions that get passed `Point'` but were optimized for `Point` get deoptimized
+- later functions get optimized again, this time supporting `Point` and `Point'` as argument
+- [detailed explanation](http://v8-io12.appspot.com/index.html#30)
+
+##### Considerations
+
+- avoid hidden class changes
+- initialize all members in **constructor function** and **in the same order**
+
+#### Class Definitions inside Functions
 
 ```js
 function createPoint(x, y) {
@@ -421,10 +486,15 @@ function usePoint(point) {
 - as a result `usePoint` won't be optimized
 - pulling the `Point` class definition out of the `createPoint` function fixes that issue as
   now the class definition is only executed once and all point prototypes match
-- the performance improvement resulting from that results from this simple change is
-  substantial, the exact speedup factor depends on the `usePoint` function
+- the performance improvement resulting from this simple change is substantial, the exact
+  speedup factor depends on the `usePoint` function
 
-### Resource
+##### Considerations
+
+- always declare classes at the script scope, i.e. _never inside functions_ when it is
+  avoidable
+
+##### Resources
 
 - [optimization patterns part1](http://benediktmeurer.de/2017/06/20/javascript-optimization-patterns-part1/)
 
@@ -549,39 +619,6 @@ few examples.
 	- Maps, Sets, WeakMaps, WeakSets used where it makes sense results in easier maintainable JavaScript as they offer specific functionality to iterate over and inspect their values
 - avoid engine specific workarounds aka _CrankshaftScript_, instead file a bug report if you discover a bottleneck
 
-### Considerations when Improving Performance
-
-Three groups of optimizations are algorithmic improvements, workarounds JavaScript limitations
-and workarounds for v8 related issues.
-
-As we have shown v8 related issues have decreased immensly and should be reported to the v8
-team if found, however in some cases workarounds are needed.
-
-However before applying any optimizations first profile your app and understand the underlying
-problem, then apply changes and prove by measuring that they change things for the better.
-
-#### Profilers
-
-- different performance problems call for different approaches to profile and visualize the
-  the cause
-- learn to use different profilers including _low level_ profilers like `perf`
-- you can start learning about different approaches via the [v8 inspection](#inspection.md) and [node.js perf
-  tooling](node.js.md) documents
-
-#### Tweaking hot Code
-
-- before applying micro optimizations to your code reason about its abstract complexity
-- evaluate how your code would be used on average and in the worst case and make sure your
-  algorithm handles both cases in a performant manner
-- prefer monomorphism in very hot code paths if possible, as polymorphic functions cannot be
-  optimized to the extent that monomorphic ones can
-- measure that strategies like _caching_ and _memoization_ actually result in performance
-  improvements before applying them as in some cases the cache lookup maybe more expensive than
-  performing the computation
-- understand limitations and costs of v8, a garbage collected system, in order to choose
-  appropriate data types to improve performance, i.e. prefer a `Uint8Array` over a `String`
-  when it makes sense
-
 ## Resources
 
 - [V8: Behind the Scenes (November Edition) - 2016](http://benediktmeurer.de/2016/11/25/v8-behind-the-scenes-november-edition/)
@@ -593,7 +630,6 @@ problem, then apply changes and prove by measuring that they change things for t
 - [Taming architecture complexity in V8 — the CodeStubAssembler - 2017](https://v8project.blogspot.com/2017/11/csa.html)
 - [V8 release v6.5 - 2018](https://v8project.blogspot.com/2018/02/v8-release-65.html)
 - [Background compilation - 2018](https://v8project.blogspot.com/2018/03/background-compilation.html)
-- [Maybe you don't need Rust and WASM to speed up your JS - 2018](https://mrale.ph/blog/2018/02/03/maybe-you-dont-need-rust-to-speed-up-your-js.html)
 - [Sea of Nodes - 2015](http://darksi.de/d.sea-of-nodes/)
 
 ### Slides
