@@ -3,6 +3,42 @@
 _find the previous version of this document at
 [crankshaft/data-types.md](crankshaft/data-types.md)_
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Efficiently Representing Values and Tagging](#efficiently-representing-values-and-tagging)
+  - [Considerations](#considerations)
+- [Objects](#objects)
+  - [Structure](#structure)
+  - [Object Properties](#object-properties)
+  - [Hash Tables](#hash-tables)
+    - [HashTables and Hash Codes](#hashtables-and-hash-codes)
+  - [Resources](#resources)
+  - [Fast, In-Object Properties](#fast-in-object-properties)
+    - [Assigning Properties inside Constructor Call](#assigning-properties-inside-constructor-call)
+    - [Assigning More Properties Later](#assigning-more-properties-later)
+    - [Assigning Same Properties in Different Order](#assigning-same-properties-in-different-order)
+  - [In-object Slack Tracking](#in-object-slack-tracking)
+  - [Methods And Prototypes](#methods-and-prototypes)
+    - [Assigning Functions to Properties](#assigning-functions-to-properties)
+    - [Assigning Functions to Prototypes](#assigning-functions-to-prototypes)
+  - [Numbered Properties](#numbered-properties)
+- [Arrays](#arrays)
+  - [Fast Elements](#fast-elements)
+  - [Dictionary Elements](#dictionary-elements)
+    - [Packed vs. Holey Elements](#packed-vs-holey-elements)
+    - [Elements Kinds](#elements-kinds)
+      - [Elements Kind Lattice](#elements-kind-lattice)
+  - [Double Array Unboxing](#double-array-unboxing)
+  - [Typed Arrays](#typed-arrays)
+    - [Float64Array](#float64array)
+  - [Considerations](#considerations-1)
+- [Strings](#strings)
+- [Resources](#resources-1)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Efficiently Representing Values and Tagging
 
 [watch](http://youtu.be/UJPdhx5zTaw?t=15m35s) | [slide](http://v8-io12.appspot.com/index.html#34)
