@@ -6,6 +6,59 @@ _find the previous version of this document at
 Fully activated with v8 version 5.9. Earliest LTS Node.js release with a TurboFan activated
 pipleline is Node.js v8.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Goals](#goals)
+- [Simplified Pipeline](#simplified-pipeline)
+  - [Basic Steps](#basic-steps)
+  - [Pipeline as Part of New V8 Architecture](#pipeline-as-part-of-new-v8-architecture)
+  - [Detailed Phases of Frontend, Optimization and Backend Stages](#detailed-phases-of-frontend-optimization-and-backend-stages)
+- [Advantages Over Old Pipeline](#advantages-over-old-pipeline)
+  - [Smaller Performance Cliffs](#smaller-performance-cliffs)
+  - [Startup Time Improved](#startup-time-improved)
+  - [Memory Usage Reduced](#memory-usage-reduced)
+  - [Baseline Performance Improved](#baseline-performance-improved)
+  - [New Language Features](#new-language-features)
+    - [New Language Features Support And Transpilers](#new-language-features-support-and-transpilers)
+  - [Resources](#resources)
+- [Ignition Interpreter](#ignition-interpreter)
+- [Collecting Feedback via ICs](#collecting-feedback-via-ics)
+  - [Monomorphism vs. Polymorphism](#monomorphism-vs-polymorphism)
+  - [Feedback Lattice](#feedback-lattice)
+  - [Information Stored in Function Closures](#information-stored-in-function-closures)
+- [TurboFan](#turbofan)
+- [Speculative Optimization](#speculative-optimization)
+  - [`add` Example of Ignition and Feedback Vector](#add-example-of-ignition-and-feedback-vector)
+    - [Bytecode annotated](#bytecode-annotated)
+    - [Feedback Used To Optimize Code](#feedback-used-to-optimize-code)
+- [Deoptimization](#deoptimization)
+  - [Bailout](#bailout)
+    - [Example of x86 Assembly Code including Checks and Bailouts](#example-of-x86-assembly-code-including-checks-and-bailouts)
+  - [Lazy Cleanup of Optimized Code](#lazy-cleanup-of-optimized-code)
+  - [Deoptimization Loop](#deoptimization-loop)
+  - [Causes for Deoptimization](#causes-for-deoptimization)
+    - [Modifying Object Shape](#modifying-object-shape)
+      - [Considerations](#considerations)
+    - [Class Definitions inside Functions](#class-definitions-inside-functions)
+      - [Considerations](#considerations-1)
+      - [Resources](#resources-1)
+  - [Inlining Functions](#inlining-functions)
+- [Background Compilation](#background-compilation)
+- [Sea Of Nodes](#sea-of-nodes)
+  - [Advantages](#advantages)
+- [CodeStubAssembler](#codestubassembler)
+  - [What is the CodeStubAssember aka CSA?](#what-is-the-codestubassember-aka-csa)
+  - [Why is it a Game Changer?](#why-is-it-a-game-changer)
+    - [Improvements via CodeStubAssembler](#improvements-via-codestubassembler)
+- [Facit](#facit)
+- [Resources](#resources-2)
+  - [Slides](#slides)
+  - [Videos](#videos)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Goals
 
 [watch](https://youtu.be/HDuSEbLWyOY?t=7m22s)
