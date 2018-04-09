@@ -32,10 +32,8 @@
     - [Tracking Pointers](#tracking-pointers)
     - [Black Allocation](#black-allocation)
   - [Resources](#resources)
-- [Memory Inspection and HeapSnapshots](#memory-inspection-and-heapsnapshots)
 - [Old Generation Garbage Collector Deep Dive](#old-generation-garbage-collector-deep-dive)
   - [Collection Steps](#collection-steps)
-  - [Collection Steps](#collection-steps-1)
   - [Mark Sweep and Mark Compact](#mark-sweep-and-mark-compact)
     - [Mark](#mark)
     - [Marking State](#marking-state)
@@ -71,7 +69,7 @@
 [watch](http://youtu.be/VhpdsjBUS3g?t=10m54s)
 
 - cheap to allocate memory
-- expensive to collect when memory pool is exausted
+- expensive to collect when memory pool is exhausted
 
 ## How objects are determined to be dead
 
@@ -260,21 +258,10 @@ to both partially parallelize the Old Generation and Young Generation garbage co
 
 - introduced with v8 v6.2 which is part of Node.js v8
 - older v8 versions used Cheney semispace copying garbage collector that divides young
-<<<<<<< HEAD
-<<<<<<< HEAD
-  generation in two equal halves, read more about it [here](../gc.md#tospace-fromspace-memory-exhaustion) TODO fix link once repo rearranged
-- single threaded scavenger made sense on single-core environments, but at this point Chrome,
-=======
   generation in two equal halves and [performed moving/copying of objects that survived GC
   synchronously](crankshaft/gc.md#tospace-fromspace-memory-exhaustion)
   - single threaded scavenger made sense on single-core environments, but at this point Chrome,
->>>>>>> ba4dddc... fix: gc
-=======
-  generation in two equal halves and [performed moving/copying of objects that survived GC
-  synchronously](crankshaft/gc.md#tospace-fromspace-memory-exhaustion) 
-  - single threaded scavenger made sense on single-core environments, but at this point Chrome,
->>>>>>> bc46a17... turbo: adding TOC to gc
-  Node.js and thus v8 runs in many multicore scenarios
+    Node.js and thus v8 runs in many multicore scenarios
 - new algorithm similar to the [Halstead semispace copying collector](https://www.cs.cmu.edu/~guyb/papers/gc2001.pdf)
   except that v8 uses dynamic instead of static _work stealing_ across multiple threads
 
@@ -312,7 +299,7 @@ of worker tasks.
 #### Memory Partition and Parallelization
 
 - heap memory is partitioned into fixed-size chunks, called _pages_
-- _young generation evacuation_ is archieved in parallel by copying memory based on pages
+- _young generation evacuation_ is achieved in parallel by copying memory based on pages
 - _memory compaction_ parallelized on page-level
 - young generation and old generation compaction phases don't depend on each other and thus are
   parallelized
@@ -353,29 +340,7 @@ of worker tasks.
 - [Optimizing V8 memory consumption](https://v8project.blogspot.com/2016/10/fall-cleaning-optimizing-v8-memory.html)
 - [Orinoco: young generation garbage collection](https://v8project.blogspot.com/2017/11/orinoco-parallel-scavenger.html)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-## Memory Inspection and HeapSnapshots
-=======
 ## Old Generation Garbage Collector Deep Dive
-
-- fast alloc
-- slow collection performed infrequently and thus in most cases doesn't affect application
-  performance as much as the more frequently performed _scavenge_
-- `~20%` of objects survive into **Old Generation**
-
-### Collection Steps
-
-[watch](http://youtu.be/VhpdsjBUS3g?t=12m30s)
-
-- parts of collection run concurrent with mutator, i.e. runs on same thread our JavaScript is executed on
-- [incremental marking/collection](http://www.memorymanagement.org/glossary/i.html#term-incremental-garbage-collection)
-- [mark-sweep](http://www.memorymanagement.org/glossary/m.html#term-mark-sweep): return memory to system
-- [mark-compact](http://www.memorymanagement.org/glossary/m.html#term-mark-compact): move values
->>>>>>> ba4dddc... fix: gc
-=======
-## Old Generation Garbage Collector
->>>>>>> bc46a17... turbo: adding TOC to gc
 
 - fast alloc
 - slow collection performed infrequently and thus in most cases doesn't affect application

@@ -76,7 +76,7 @@ into the inner workings of v8.
 - `--runtime-call-stats` dumps statistics about the v8 runtime to the console
 - these stats give detailed info where v8 time is spent
 
-**Sample Output** (abreviated)
+**Sample Output** (abbreviated)
 
 ```
 
@@ -132,7 +132,7 @@ into the inner workings of v8.
 - then use `%DebugPrint(array)` to dump information about this array to the console
 - the `elements` field will hold information about the _elements kinds_ of the array
 
-**Sample Output** (abreviated)
+**Sample Output** (abbreviated)
 
 ```
 DebugPrint: 0x1fbbad30fd71: [JSArray]
@@ -199,7 +199,7 @@ perf report ## add --no-children to avoid expanding nodes
 Three groups of optimizations are algorithmic improvements, workarounds JavaScript limitations
 and workarounds for v8 related issues.
 
-As we have shown v8 related issues have decreased immensly and should be reported to the v8
+As we have shown v8 related issues have decreased immensely and should be reported to the v8
 team if found, however in some cases workarounds are needed.
 
 However before applying any optimizations first profile your app and understand the underlying
@@ -208,7 +208,7 @@ problem, then apply changes and prove by measuring that they change things for t
 #### Profilers
 
 - different performance problems call for different approaches to profile and visualize the
-  the cause
+  cause
 - learn to use different profilers including _low level_ profilers like `perf`
 
 #### Tweaking hot Code

@@ -52,10 +52,11 @@ pipleline is Node.js v8.
   - [What is the CodeStubAssember aka CSA?](#what-is-the-codestubassember-aka-csa)
   - [Why is it a Game Changer?](#why-is-it-a-game-changer)
     - [Improvements via CodeStubAssembler](#improvements-via-codestubassembler)
-- [Facit](#facit)
+- [Recommendations](#recommendations)
 - [Resources](#resources-2)
   - [Slides](#slides)
   - [Videos](#videos)
+  - [More Resources](#more-resources)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -91,7 +92,7 @@ Once crankshaft was taken out of the mix the below pipeline was possible
 2. Generate bytecode from that AST
 3. Turn bytecode into sequence of bytecodes by the BytecodeGenerator, which is part of the [Ignition Interpreter](https://v8project.blogspot.com/2016/08/firing-up-ignition-interpreter.html)
   - sequences are divided on a per function basis
-4. Execute bytecode sequences via Ignition and collect feedback via inline chaches
+4. Execute bytecode sequences via Ignition and collect feedback via inline caches
   - feedback used by Ignition itself to speed up subsequent interpretation of the bytecode
   - feedback used for speculative optimization by TurboFan when code is optimized
 5. _Speculatively_ optimize and compile bytecode using collected feedback to generate optimized machine code
@@ -133,7 +134,7 @@ Once crankshaft was taken out of the mix the below pipeline was possible
 ### Smaller Performance Cliffs
 
 - for most websites the optimizing compiler isn't important and could even hurt performance
-  (speculative optimizations arent' cheap)
+  (speculative optimizations aren't cheap)
 - pages need to load fast and unoptimized code needs to run fast _enough_, esp. on mobile
   devices
 - previous v8 implementations suffered from _performance cliffs_
@@ -179,14 +180,14 @@ Once crankshaft was taken out of the mix the below pipeline was possible
 - can address optimization killers that Crankshaft couldn't b/c it never supported fundamental techniques needed to do so
 - as a result no specific syntax (like `try/catch`) inside a function will cause it not being optimized
 - other subtle optimization killers that made performance unpredictable are no longer an issue and if they are they can be easily fixed in TF
-	- passing `undefined` as first parameter to `Math.max.apply`
-	- mixing strict and sloppy modes
+  - passing `undefined` as first parameter to `Math.max.apply`
+  - mixing strict and sloppy modes
 - easier to support future JavaScript features as the JavaScript frontend is clearly separated
   from the architecture dependent backends
 - new language features are not useful by just being implemented
 - need to be fast (at least matching transpiled code), related optimizations are easier with
   new pipeline
-- need to support debugging and be inspectable, this is archieved via better integration with
+- need to support debugging and be inspectable, this is achieved via better integration with
   Chrome DevTools
 - new language features are easier optimized which makes them useable after much shorter time
   after they are introduced to v8 (previously performance issues for new features prevented
@@ -317,7 +318,7 @@ TurboFan is a simple compiler + backend responsible for the following:
 - code generation
 - generates fast code via _speculative optimization_ from the feedback collected while running
   unoptimized bytecode
-- architecture specific optimizatinos exploit features of each target platform for best quality
+- architecture specific optimizations exploit features of each target platform for best quality
   code
 
 TurboFan is not just an optimizing compiler:
@@ -397,7 +398,7 @@ Return        ; end execution, return value in accum. reg. and tranfer control t
   - if assumptions are violated again, deoptimized again and start over
 - too many deoptimizations cause function to be sent to *deoptimization hell*
   - considered not optimizable and no optimization is **ever** attempted again
-- assumtions are verified as follows:
+- assumptions are verified as follows:
   - _code objects_ are verified via a `test` in the _prologue_ of the generated machine code for a
     particular function
   - argument types are verified before entering the function body
@@ -458,7 +459,7 @@ jo Deoptimize                   ; if overflowed bail
 
 [read](https://v8project.blogspot.com/2018/02/v8-release-65.html)
 
-- occured when optimized code deoptimized and there was _no way to learn what went wrong_
+- occurred when optimized code deoptimized and there was _no way to learn what went wrong_
 - one cause was altering the shape of the array in the callback function of a second order
   array builtin, i.e. by changing it's length
 - TurboFan kept trying to optimized and gave up after ~30 attempts
@@ -627,7 +628,7 @@ Flexibility of sea of nodes approach enables the below optimizations.
 - can generate highly efficient code for parts of slow-paths in JS without crossing to C++
   runtime
 - API includes very low-level operations (pretty much assembly), _primitive_ CSA instructions
-  that translate directly into one or twy assembly instructions
+  that translate directly into one or two assembly instructions
 - Macros include fixed set of pre-defined CSA instructions corresponding to most commonly used
   assembly instructions
 
@@ -660,11 +661,11 @@ few examples.
 -  [faster Regular Expressions](./js-feature-improvements.md#regular-expressions) sped up by
    removing need to switch between C++ and JavaScript runtimes
 - `Object.create` has predictable performance by using CodeStubAssembler
-- `Function.prototype.bind` archieved final boost when ported to CodeStubAssembler for a total
+- `Function.prototype.bind` achieved final boost when ported to CodeStubAssembler for a total
   60,000% improvement
 - `Promise`s where ported to CodeStubAssembler which resulted in 500% speedup for `async/await`
 
-## Facit
+## Recommendations
 
 [watch](https://youtu.be/M1FBosB5tjM?t=52m54s) |
 [watch](https://youtu.be/HDuSEbLWyOY?t=10m36s) |
@@ -676,7 +677,7 @@ few examples.
 - instead focus on your application design
 - now can handle exceptions where it makes sense as `try/catch/finally` no longer ruins the performance of a function
 - use appropriate collections as their performance is on par with the raw use of Objects for same task
-	- Maps, Sets, WeakMaps, WeakSets used where it makes sense results in easier maintainable JavaScript as they offer specific functionality to iterate over and inspect their values
+  - Maps, Sets, WeakMaps, WeakSets used where it makes sense results in easier maintainable JavaScript as they offer specific functionality to iterate over and inspect their values
 - avoid engine specific workarounds aka _CrankshaftScript_, instead file a bug report if you discover a bottleneck
 
 ## Resources
@@ -707,3 +708,7 @@ few examples.
 - [performance improvements in latest v8 - 2017](https://youtu.be/HDuSEbLWyOY?t=4m58s)
 - [v8 and how it listens to you - ICs and FeedbackVectors - 2017](https://www.youtube.com/watch?v=u7zRSm8jzvA)
 - [Escape Analysis in V8 - 2018](https://www.youtube.com/watch?v=KiWEWLwQ3oI)
+
+### More Resources
+
+- [TurboFan wiki](https://github.com/v8/v8/wiki/TurboFan)

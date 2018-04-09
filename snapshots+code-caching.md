@@ -71,7 +71,7 @@ Since Chrome embeds v8 it can make use of Code Caching and does so as follows.
 - only about 30% of builtin functions are used on average
 - deserialize builtin function from the snapshot when it is called the first time
 - functions have _well-known_ positions within the snapshot's dedicated builtins area
-- starting offset of each code boject is kept in a dedicated section within builtins area
+- starting offset of each code object is kept in a dedicated section within builtins area
 - additionally implemented lazy deserializations for bytecode handlers, which contain logic to
   execute each bytecode within Ignition interpreter
 - enabled in v8 v6.4 resulting in average v8's heap size savings of 540 KB

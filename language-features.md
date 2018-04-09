@@ -6,7 +6,7 @@ up.
 
 The bottom line is that most features that could not be optimized previously due to limitations
 of crankshaft are now first class citizens of the new compiler chain and don't prevent
-optimizations anymore. 
+optimizations anymore.
 
 Therefore write clean idiomatic code [as explained
 here](https://github.com/thlorenz/v8-perf/blob/turbo/compiler.md#facit), and use all features
@@ -19,55 +19,55 @@ that the language provides.
 - [Function Bind](#function-bind)
   - [Why Was Bind Slow?](#why-was-bind-slow)
   - [What Changed?](#what-changed)
-  - [Facit](#facit)
+  - [Recommendations](#recommendations)
   - [Resources](#resources)
 - [instanceof and @@hasInstance](#instanceof-and-hasinstance)
-  - [Facit](#facit-1)
+  - [Recommendations](#recommendations-1)
   - [Resources](#resources-1)
 - [Reflection API](#reflection-api)
   - [Resources](#resources-2)
 - [Array Builtins](#array-builtins)
 - [const](#const)
-  - [Facit](#facit-2)
+  - [Recommendations](#recommendations-2)
   - [Resources](#resources-3)
 - [Iterating Maps and Sets via `for of`](#iterating-maps-and-sets-via-for-of)
   - [Why was it Slow?](#why-was-it-slow)
   - [What Changed?](#what-changed-1)
-  - [Facit](#facit-3)
+  - [Recommendations](#recommendations-3)
   - [Resources](#resources-4)
 - [Iterating Maps and Sets via `forEach` and Callbacks](#iterating-maps-and-sets-via-foreach-and-callbacks)
   - [Why was it Slow?](#why-was-it-slow-1)
   - [What Changed?](#what-changed-2)
-  - [Facit](#facit-4)
+  - [Recommendations](#recommendations-4)
   - [Resources](#resources-5)
 - [Iterating Object properties via for in](#iterating-object-properties-via-for-in)
   - [Incorrect Use of For In To Iterate Object Properties](#incorrect-use-of-for-in-to-iterate-object-properties)
   - [Correct Use of For In To Iterate Object Properties](#correct-use-of-for-in-to-iterate-object-properties)
   - [Why was it Fast?](#why-was-it-fast)
   - [What Changed?](#what-changed-3)
-  - [Facit](#facit-5)
+  - [Recommendations](#recommendations-5)
   - [Resources](#resources-6)
 - [Object Constructor Subclassing and Class Factories](#object-constructor-subclassing-and-class-factories)
-  - [Facit](#facit-6)
+  - [Recommendations](#recommendations-6)
   - [Resources](#resources-7)
 - [Tagged Templates](#tagged-templates)
   - [Resources](#resources-8)
 - [Typed Arrays and ArrayBuffer](#typed-arrays-and-arraybuffer)
-  - [Facit](#facit-7)
+  - [Recommendations](#recommendations-7)
   - [Resources](#resources-9)
 - [Object.is](#objectis)
   - [Resources](#resources-10)
 - [Regular Expressions](#regular-expressions)
   - [Resources](#resources-11)
 - [Destructuring](#destructuring)
-  - [Facit](#facit-8)
+  - [Recommendations](#recommendations-8)
   - [Resources](#resources-12)
 - [Promises Async/Await](#promises-asyncawait)
   - [Resources](#resources-13)
 - [Generators](#generators)
   - [Resources](#resources-14)
 - [Proxies](#proxies)
-  - [Facit](#facit-9)
+  - [Recommendations](#recommendations-9)
   - [Resources](#resources-15)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -81,7 +81,7 @@ that the language provides.
 - language boundaries C++/JS were crossed both ways which is expensive (esp.  calling back from
   C++ into JS)
 - two temporary arrays were created on every invocation of a bound function
-- dut to crankshaft limitations this couldn't be fixed easily there
+- due to crankshaft limitations this couldn't be fixed easily there
 
 ### What Changed?
 
@@ -94,12 +94,12 @@ that the language provides.
 - resulted in **~400x** speed improvement
 - the performance of the React runtime,  which makes heavy use of `bind`, doubled as a result
 
-### Facit
+### Recommendations
 
 - developers should use bound functions freely wherever they apply without having to worry
   about performance penalties
-- the two below snippets perform same but arguable the second one is more readable and for the
-  case of `arr.reduce` is the only wat to pass `this` as it doesn't support passing it as a
+- the two below snippets perform the same but arguably the second one is more readable and for the
+  case of `arr.reduce` is the only way to pass `this` as it doesn't support passing it as a
   separate parameter like `forEach` and `map` do
 
 ```js
@@ -121,7 +121,7 @@ arr.map(convert.bind(this))
 
 - latest JS allows overriding behavior of `instanceOf` via the `@@hasInstance` _well known
   symbol_
-- naívely this requires a check if `@@hasInstance` is defined for the given object every time
+- naively this requires a check if `@@hasInstance` is defined for the given object every time
   `instanceof` is invoked for it (in 99% of the cases it won't be defined)
 - initially that check was skipped as long as no overrides were added EVER (global protector
   cell)
@@ -133,12 +133,12 @@ arr.map(convert.bind(this))
 - similar improvements were made in similar fashion to other _well-known symbols_ like
   `@@iterator` and `@@toStringTag`
 
-### Facit
+### Recommendations
 
 - developers can use `instanceof` freely without worrying about non-deterministic performance
   characteristics
 - developers should think hard before overriding its behavior via `@@hasInstance` since this
-  _magical behavior_ may confuse others, but using it will incurr no performance penalties
+  _magical behavior_ may confuse others, but using it will incur no performance penalties
 
 ### Resources
 
@@ -177,7 +177,7 @@ arr.map(convert.bind(this))
   accessed (_Function Context Specialization_)
 - thus `const` improves performance, but only once the code was optimized
 
-### Facit
+### Recommendations
 
 - `const`, like `let` adds cost due to TDZ (temporal deadzone) and thus performs slightly worse
   in unoptimized code
@@ -206,13 +206,13 @@ arr.map(convert.bind(this))
 - improved optimization of calls to `iterator.next()`
 - avoid allocation of `iterResult` via _store-load propagation_, _escape analysis_ and _scalar
   replacement of aggregates_
-- avoid alloation of the _iterator_
+- avoid allocation of the _iterator_
 - fully implemented in JavaScript via [CodeStubAssembler](https://github.com/v8/v8/wiki/CodeStubAssembler-Builtins)
 - only calls to C++ during GC
 - full optimization now possible due to TurboFan's ability to optimize functions that include a
   `try/catch` statement
 
-### Facit
+### Recommendations
 
 - use `for of` wherever needed without having to worry about performance cost
 
@@ -238,9 +238,8 @@ arr.map(convert.bind(this))
   [CodeStubAssembler](https://github.com/v8/v8/wiki/CodeStubAssembler-Builtins) which lead to
   a significant performance improvement
 - since now no C++ is in play these function can further be optimized and inlined by TurboFan
-  (TODO: has this happened yet?)
 
-### Facit
+### Recommendations
 
 - performance cost of using builtin `forEach` on `Map`s and `Set`s has been reduced drastically
 - however an additional closure is created which causes memory overhead
@@ -302,7 +301,7 @@ for (const prop in obj) {
   supports all complex cases like ES6 Proxies
 - coupled with other TurboFan+Ignition advantages this led to ~60% speedup of the above case
 
-### Facit
+### Recommendations
 
 - `for in` coupled with the correct use of `Object.prototype.hasOwnProperty.call(obj, prop)` is
   a very fast way to iterate over the properties of an object and thus should be used for these
@@ -335,7 +334,7 @@ const FooBar = createClassBasedOn(Bar)
 - TurboFan detects the cases for which the `Object` constructor is used as the base class and
   fully inlines object instantiation
 
-### Facit
+### Recommendations
 
 - class factories won't incur any extra overhead if no specific base class needs to be _mixed
   in_ and `Object` is passed to be extended from
@@ -364,7 +363,7 @@ const FooBar = createClassBasedOn(Bar)
 - storing booleans inside TypedArrays was improved to where it now is identical to storing
   integers
 
-### Facit
+### Recommendations
 
 - TypedArrays should be used wherever possible as it allows v8 to apply optimizations faster
   and more aggressively than for instance with plain Arrays
@@ -407,7 +406,7 @@ const FooBar = createClassBasedOn(Bar)
 
 - _array destructuring_ performance on par with _naive_ ES5 equivalent
 
-### Facit
+### Recommendations
 
 - employ destructuring syntax freely in your applications
 
@@ -455,9 +454,9 @@ const FooBar = createClassBasedOn(Bar)
   - [set trap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/set)
     27%-438% improvement, larger improvement when trap is set
 
-### Facit
+### Recommendations
 
-- while the use of proxies does incurr an overhead, that overhead has been reduced drastically,
+- while the use of proxies does incur an overhead, that overhead has been reduced drastically,
   but still should be avoided in hot code paths
 - however use proxies whenever the problem you're trying to solve calls for it
 
