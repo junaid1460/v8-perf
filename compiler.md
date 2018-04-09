@@ -541,6 +541,12 @@ function usePoint(point) {
   now the class definition is only executed once and all point prototypes match
 - the performance improvement resulting from this simple change is substantial, the exact
   speedup factor depends on the `usePoint` function
+- when class or prototype definition is collected it's hidden class (associated maps) are
+  collected as well
+- need to re-learn hidden classes for short living objects including metadata and all feedback
+  collected by inline caches
+- references to maps and JS objects from optimized code are considered weak to avoid memory
+  leaks
 
 ##### Considerations
 
@@ -550,6 +556,7 @@ function usePoint(point) {
 ##### Resources
 
 - [optimization patterns part1](http://benediktmeurer.de/2017/06/20/javascript-optimization-patterns-part1/)
+- [The case of temporary objects in Chrome](http://benediktmeurer.de/2016/10/11/the-case-of-temporary-objects-in-chrome/)
 
 ### Inlining Functions
 
