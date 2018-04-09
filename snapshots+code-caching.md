@@ -4,6 +4,20 @@ This document explains techniques used by v8 in order to avoid having to re-comp
 optimized JavaScript whenever an application that embeds it (i.e. Chrome or Node.js) starts up
 fresh.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Code Caching](#code-caching)
+  - [Chrome's Use of Code Caching](#chromes-use-of-code-caching)
+  - [Resources](#resources)
+- [Startup Snapshots](#startup-snapshots)
+  - [Custom Startup Snapshots](#custom-startup-snapshots)
+  - [Lazy Deserialization](#lazy-deserialization)
+  - [Resources](#resources-1)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Code Caching
 
 - lessens overhead of parsing + compiling script
