@@ -1,5 +1,33 @@
 # Inspection and Performance Profiling
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [v8 flags](#v8-flags)
+  - [AST](#ast)
+  - [Byte Code](#byte-code)
+  - [Tracing Inline Caches](#tracing-inline-caches)
+  - [Optimized Code](#optimized-code)
+  - [Tracing Optimizations](#tracing-optimizations)
+  - [Tracing Map Creation](#tracing-map-creation)
+    - [Resources](#resources)
+  - [Runtime Call Stats](#runtime-call-stats)
+    - [Resources](#resources-1)
+  - [Memory Visualization](#memory-visualization)
+    - [Resources](#resources-2)
+  - [Array Elements Kinds](#array-elements-kinds)
+    - [Resources](#resources-3)
+- [Node.js Perf And Tooling](#nodejs-perf-and-tooling)
+  - [Perf](#perf)
+  - [Resources](#resources-4)
+- [Considerations when Improving Performance](#considerations-when-improving-performance)
+    - [Profilers](#profilers)
+    - [Tweaking hot Code](#tweaking-hot-code)
+  - [Resources](#resources-5)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## v8 flags
 
 Multiple flags and so called _run time functions_ are available to anyone who likes to peek
@@ -138,7 +166,7 @@ elements transition [PACKED_SMI_ELEMENTS -> PACKED_DOUBLE_ELEMENTS]
 - ["Elements kinds" in V8](https://v8project.blogspot.com/2017/09/elements-kinds-in-v8.html)
 
 
-# Node.js Perf And Tooling
+## Node.js Perf And Tooling
 
 [watch](https://youtu.be/EdFDJANJJLs?t=23m51s)
 
@@ -151,7 +179,7 @@ elements transition [PACKED_SMI_ELEMENTS -> PACKED_DOUBLE_ELEMENTS]
 	- _in line_ breakpoints allow breaking on specific statement on a line with multiple statements
 	- async code flow debugging is supported (async stack traces)
 
-## Perf
+### Perf
 
 [read](https://mrale.ph/blog/2018/02/03/maybe-you-dont-need-rust-to-speed-up-your-js.html#profiling-the-pure-javascript-version)
 
@@ -165,6 +193,7 @@ perf report ## add --no-children to avoid expanding nodes
 ### Resources
 
 - [Maybe you don't need Rust and WASM to speed up your JS - 2018](https://mrale.ph/blog/2018/02/03/maybe-you-dont-need-rust-to-speed-up-your-js.html)
+
 ## Considerations when Improving Performance
 
 Three groups of optimizations are algorithmic improvements, workarounds JavaScript limitations
