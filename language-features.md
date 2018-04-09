@@ -1,3 +1,77 @@
+# Language Features
+
+This document lists JavaScript language features and provides info with regard to their
+performance. In some cases it is explained why a feature used to be slow and how it was sped
+up.
+
+The bottom line is that most features that could not be optimized previously due to limitations
+of crankshaft are now first class citizens of the new compiler chain and don't prevent
+optimizations anymore. 
+
+Therefore write clean idiomatic code [as explained
+here](https://github.com/thlorenz/v8-perf/blob/turbo/compiler.md#facit), and use all features
+that the language provides.
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Function Bind](#function-bind)
+  - [Why Was Bind Slow?](#why-was-bind-slow)
+  - [What Changed?](#what-changed)
+  - [Facit](#facit)
+  - [Resources](#resources)
+- [instanceof and @@hasInstance](#instanceof-and-hasinstance)
+  - [Facit](#facit-1)
+  - [Resources](#resources-1)
+- [Reflection API](#reflection-api)
+  - [Resources](#resources-2)
+- [Array Builtins](#array-builtins)
+- [const](#const)
+  - [Facit](#facit-2)
+  - [Resources](#resources-3)
+- [Iterating Maps and Sets via `for of`](#iterating-maps-and-sets-via-for-of)
+  - [Why was it Slow?](#why-was-it-slow)
+  - [What Changed?](#what-changed-1)
+  - [Facit](#facit-3)
+  - [Resources](#resources-4)
+- [Iterating Maps and Sets via `forEach` and Callbacks](#iterating-maps-and-sets-via-foreach-and-callbacks)
+  - [Why was it Slow?](#why-was-it-slow-1)
+  - [What Changed?](#what-changed-2)
+  - [Facit](#facit-4)
+  - [Resources](#resources-5)
+- [Iterating Object properties via for in](#iterating-object-properties-via-for-in)
+  - [Incorrect Use of For In To Iterate Object Properties](#incorrect-use-of-for-in-to-iterate-object-properties)
+  - [Correct Use of For In To Iterate Object Properties](#correct-use-of-for-in-to-iterate-object-properties)
+  - [Why was it Fast?](#why-was-it-fast)
+  - [What Changed?](#what-changed-3)
+  - [Facit](#facit-5)
+  - [Resources](#resources-6)
+- [Object Constructor Subclassing and Class Factories](#object-constructor-subclassing-and-class-factories)
+  - [Facit](#facit-6)
+  - [Resources](#resources-7)
+- [Tagged Templates](#tagged-templates)
+  - [Resources](#resources-8)
+- [Typed Arrays and ArrayBuffer](#typed-arrays-and-arraybuffer)
+  - [Facit](#facit-7)
+  - [Resources](#resources-9)
+- [Object.is](#objectis)
+  - [Resources](#resources-10)
+- [Regular Expressions](#regular-expressions)
+  - [Resources](#resources-11)
+- [Destructuring](#destructuring)
+  - [Facit](#facit-8)
+  - [Resources](#resources-12)
+- [Promises Async/Await](#promises-asyncawait)
+  - [Resources](#resources-13)
+- [Generators](#generators)
+  - [Resources](#resources-14)
+- [Proxies](#proxies)
+  - [Facit](#facit-9)
+  - [Resources](#resources-15)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Function Bind
 
 ### Why Was Bind Slow?
