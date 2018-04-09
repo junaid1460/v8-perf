@@ -1,3 +1,9 @@
+# Snapshots and Code Caching
+
+This document explains techniques used by v8 in order to avoid having to re-compile and
+optimized JavaScript whenever an application that embeds it (i.e. Chrome or Node.js) starts up
+fresh.
+
 ## Code Caching
 
 - lessens overhead of parsing + compiling script
