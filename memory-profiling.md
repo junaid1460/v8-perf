@@ -1,5 +1,48 @@
 # Memory Profiling
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Theory](#theory)
+  - [Objects](#objects)
+    - [Shallow size](#shallow-size)
+    - [Retained size](#retained-size)
+      - [GC roots](#gc-roots)
+    - [Storage](#storage)
+    - [Object Groups](#object-groups)
+  - [Retainers](#retainers)
+  - [Dominators](#dominators)
+  - [Causes for Leaks](#causes-for-leaks)
+- [Tools](#tools)
+  - [DevTools Allocation Timeline](#devtools-allocation-timeline)
+    - [Allocation Stack](#allocation-stack)
+    - [Recording Allocation Timeline with Node.js](#recording-allocation-timeline-with-nodejs)
+  - [DevTools Allocation Profile](#devtools-allocation-profile)
+    - [Recording Allocation Profile with Node.js](#recording-allocation-profile-with-nodejs)
+  - [DevTools Heap Snapshots](#devtools-heap-snapshots)
+    - [Taking Heap Snapshot with Node.js](#taking-heap-snapshot-with-nodejs)
+    - [Views](#views)
+      - [Color Coding](#color-coding)
+      - [Summary View](#summary-view)
+        - [Limiting included Objects](#limiting-included-objects)
+      - [Comparison View](#comparison-view)
+      - [Containment View](#containment-view)
+        - [Entry Points](#entry-points)
+      - [Dominators View](#dominators-view)
+      - [Retainer View](#retainer-view)
+    - [Constructors listed in Views](#constructors-listed-in-views)
+      - [Closures](#closures)
+        - [Advanced Comparison Technique](#advanced-comparison-technique)
+    - [Dynamic Heap Limit and Large HeapSnapshots](#dynamic-heap-limit-and-large-heapsnapshots)
+- [Considerations to make code easier to debug](#considerations-to-make-code-easier-to-debug)
+- [Resources](#resources)
+  - [blogs/tutorials](#blogstutorials)
+  - [videos](#videos)
+  - [slides](#slides)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Theory
 
 ### Objects
