@@ -1,5 +1,8 @@
 # Inspection and Performance Profiling
 
+_find the previous version of this document at
+[crankshaft/performance-profiling.md](crankshaft/performance-profiling.md)_
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
