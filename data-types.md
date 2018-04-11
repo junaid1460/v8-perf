@@ -465,4 +465,4 @@ map |len |hash|characters
 - [v8-design](https://developers.google.com/v8/design#garb_coll)
 - [Fast Properties in V8 - 2017](https://v8project.blogspot.com/2017/08/fast-properties.html)
 - [“Elements kinds” in V8 - 2017](https://v8project.blogspot.com/2017/09/elements-kinds-in-v8.html)
-
+- [video: V8 internals for JavaScript developers - 2018](https://www.youtube.com/watch?v=m9cTaYI95Zc)
